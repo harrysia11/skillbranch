@@ -36,6 +36,15 @@ object UserHolder {
 
      fun registerUserByPhone(fullName:String, rawPhone:String):User{
 
+         var testPhone = rawPhone.replace("[^+\\d]".toRegex(), "")
+
+         if(testPhone.startsWith("+")) {
+             testPhone = testPhone.substring(1)
+         }
+         if (testPhone.length != 11) {
+             throw IllegalArgumentException("Enter a valid phone starting with + and containing 11 digits")
+         }
+
         val newUser =  User.makeUser(fullName,null,null,rawPhone)
 
         if(map.containsKey(newUser.login)) { throw IllegalArgumentException("A user with this email already exist")}
@@ -45,8 +54,15 @@ object UserHolder {
     }
 
 
-    fun requestAccessCode(rawPhone: String) {
-
+    fun requestAccessCode(login: String) {
+        var user:User? = null
+        for (element in map ){
+            if(element.key == login) user = element.value
+        }
+        if(user == null) {
+            return
+        }
+        user.changePassword()
     }
 
     fun clearMap(){

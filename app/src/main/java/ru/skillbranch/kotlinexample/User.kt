@@ -131,11 +131,22 @@ class User private constructor(
     fun changePassword(oldPassword:String, newPassword: String){
         if(checkPassword(oldPassword)){
             passwordHash = encypt(newPassword)
+            accessCode = newPassword
         }else{
             throw IllegalArgumentException("The entered password does not match current password")
         }
 
     }
+
+    fun changePassword(){
+        val newAccessCode = generateAccessCode()
+        passwordHash = encypt(newAccessCode)
+        accessCode = newAccessCode
+        sendAccessCodeToUser(login,newAccessCode)
+
+    }
+
+
 
     companion object {
 
