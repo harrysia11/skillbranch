@@ -47,7 +47,7 @@ object UserHolder {
 
         val newUser =  User.makeUser(fullName,null,null,rawPhone)
 
-        if(map.containsKey(newUser.login)) { throw IllegalArgumentException("A user with this  phone already exists")}
+        if(map.containsKey(newUser.login)) { throw IllegalArgumentException("A user with this phone already exists")}
 
         return newUser.also { user -> map[user.login] = user }
 
