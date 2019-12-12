@@ -47,7 +47,7 @@ object UserHolder {
 
         val newUser =  User.makeUser(fullName,null,null,rawPhone)
 
-        if(map.containsKey(newUser.login)) { throw IllegalArgumentException("A user with this phone already exists")}
+        if(map.containsKey(newUser.login)) { throw IllegalArgumentException("A user with this number phone already exists")}
 
         return newUser.also { user -> map[user.login] = user }
 
@@ -55,9 +55,10 @@ object UserHolder {
 
 
     fun requestAccessCode(login: String) {
+        val oldLogin = login.replace("[^+\\d]".toRegex(), "")
         var user:User? = null
         for (element in map ){
-            if(element.key == login) user = element.value
+            if(element.key == oldLogin) user = element.value
         }
         if(user == null) {
             return
