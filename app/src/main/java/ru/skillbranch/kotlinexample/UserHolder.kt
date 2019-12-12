@@ -42,7 +42,7 @@ object UserHolder {
              testPhone = testPhone.substring(1)
          }
          if (testPhone.length != 11) {
-             throw IllegalArgumentException("Enter a valid phone starting with a + and containing 11 digits")
+             throw IllegalArgumentException("Enter a valid phone number starting with a + and containing 11 digits")
          }
 
         val newUser =  User.makeUser(fullName,null,null,rawPhone)
