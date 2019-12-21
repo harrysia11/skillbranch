@@ -16,6 +16,7 @@ class Bottombar @JvmOverloads constructor(
         View.inflate(context, R.layout.layout_bottombar,this)
 
 
+
     }
 
 }
