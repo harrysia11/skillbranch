@@ -19,7 +19,9 @@ class ArticleSubmenu @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
+
     var isOpen = false
+
     private var centerX: Float = context.dpToPx(200)
     private var centerY: Float = context.dpToPx(96)
 
@@ -34,12 +36,14 @@ class ArticleSubmenu @JvmOverloads constructor(
     fun open() {
         if (isOpen || !isAttachedToWindow) return
         isOpen = true
+        visibility = View.VISIBLE
         animatedShow()
     }
 
     fun close() {
         if (!isOpen || !isAttachedToWindow) return
         isOpen = false
+        visibility = View.GONE
         animatedHide()
     }
 
