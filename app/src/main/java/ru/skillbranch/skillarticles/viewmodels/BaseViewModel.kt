@@ -5,10 +5,10 @@ import androidx.lifecycle.*
 import java.lang.IllegalArgumentException
 
 abstract  class BaseViewModel<T>(initState:T) : ViewModel() {
-    protected val state: MediatorLiveData<T> = MediatorLiveData<T>().apply {
+    val state: MediatorLiveData<T> = MediatorLiveData<T>().apply {
         value = initState
     }
-    protected val notifications =  MutableLiveData<Event<Notify>>()
+    val notifications =  MutableLiveData<Event<Notify>>()
 
     protected val currentState
         get() = state.value!!
@@ -78,6 +78,8 @@ class Event<out E>(private val content: E) {
             content
         }
     }
+    fun peekContent(): E = content
+
 }
 
 class EventObserver<E>( private val onEventUnhandledContent: (E) -> Unit): Observer<Event<E>>{
@@ -94,14 +96,14 @@ sealed class Notify( val message: String){
 
     data class ActionMessage(
         val msg: String,
-        val actionLable: String,
+        val actionLabel: String,
         val actionHandler: (() -> Unit)?
     ) : Notify(msg)
 
 
     data class ErrorMessage(
         val msg: String,
-        val errorLable: String,
+        val errorLabel: String,
         val errorHandler: (() -> Unit)?
     ) : Notify(msg)
 

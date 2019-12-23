@@ -57,12 +57,12 @@ class RootActivity : AppCompatActivity() {
             when(notify){
                 is Notify.TextMessage -> {}
                 is Notify.ActionMessage -> {
-                    snackbar.setAction(notify.actionLable){
+                    snackbar.setAction(notify.actionLabel){
                         notify.actionHandler?.invoke()
                     }
                 }
                 is Notify.ErrorMessage -> {
-                    snackbar.setAction(notify.errorLable){
+                    snackbar.setAction(notify.errorLabel){
                         notify.errorHandler?.invoke()
                     }
                     snackbar.setTextColor(getColor(R.color.design_default_color_error))
