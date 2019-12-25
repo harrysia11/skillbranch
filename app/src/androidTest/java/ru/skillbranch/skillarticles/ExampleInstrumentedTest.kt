@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.AfterClass
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,8 +21,15 @@ import java.util.*
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
+
+@AfterClass
+fun clearTst(){
+   // val vm = ArticleViewModel("0")
+}
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
+
+   // val vm = ArticleViewModel("0")
 
     @Test
     @UiThreadTest

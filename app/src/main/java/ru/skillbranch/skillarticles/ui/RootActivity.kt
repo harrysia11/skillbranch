@@ -62,8 +62,8 @@ class RootActivity : AppCompatActivity() {
                     }
                 }
                 is Notify.ErrorMessage -> {
-                    snackbar.setAction(notify.errorLabel){
-                        notify.errorHandler?.invoke()
+                    snackbar.setAction(notify.errLabel){
+                        notify.errHandler?.invoke()
                     }
                     snackbar.setTextColor(getColor(R.color.design_default_color_error))
                 }
@@ -111,7 +111,7 @@ class RootActivity : AppCompatActivity() {
             btn_text_down.isChecked = true
         }
 
-        tv_text_content.text = if(data.isLoadingContent) "loading..." else data.content.first() as String
+        tv_text_content.text = if(!data.isLoadingContent || data.content.size == 0) "loading..." else data.content.first() as String
 
         toolbar.title = data.title ?: "loading..."
         toolbar.subtitle = data.category ?: "loading"
