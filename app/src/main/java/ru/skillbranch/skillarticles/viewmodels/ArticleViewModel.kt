@@ -24,8 +24,7 @@ class ArticleViewModel(
                 category = article.category,
                 categoryIcon = article.categoryIcon,
                 date = article.date.format(),
-                author = article.author,
-                isAuth = true
+                author = article.author
             )
         }
 
