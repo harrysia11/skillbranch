@@ -23,7 +23,8 @@ class ArticleViewModel(
                 title = article.title,
                 category = article.category,
                 categoryIcon = article.categoryIcon,
-                date = article.date.format()
+                date = article.date.format(),
+                author = article.author
             )
         }
 
