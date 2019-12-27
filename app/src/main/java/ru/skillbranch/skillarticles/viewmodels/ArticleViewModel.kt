@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import ru.skillbranch.skillarticles.data.ArticleData
 import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
@@ -13,6 +14,7 @@ class ArticleViewModel(
     ) :   BaseViewModel<ArticleState>(ArticleState()) , IArticleViewModel{
 
     private val repository = ArticleRepository
+    private val TAG : String = "ArticleViewModel"
 
     init {
 
@@ -85,6 +87,7 @@ class ArticleViewModel(
 
     override fun handleNightMode() {
         val settings = currentState.toAppSettings()
+        Log.d(TAG, "isDarkMode ${currentState.isDarkMode}")
         repository.updateSettings(settings.copy(isDarkMode = !settings.isDarkMode))
 
     }
@@ -124,11 +127,9 @@ class ArticleViewModel(
     }
 
     override fun handleSearchMode(isSearch: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun handleSearch(query: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 

@@ -2,6 +2,7 @@ package ru.skillbranch.skillarticles.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
@@ -77,7 +78,9 @@ class RootActivity : AppCompatActivity() {
             viewModel.handleUpText()
         }
         btn_text_down.setOnClickListener { viewModel.handleDownText() }
-        switch_mode.setOnClickListener { viewModel.handleNightMode() }
+        switch_mode.setOnClickListener { viewModel.handleNightMode()
+
+                                        }
 
     }
 
@@ -92,6 +95,7 @@ class RootActivity : AppCompatActivity() {
 
     private fun renderUi(data: ArticleState){
 
+        Log.d("renderUi","renderUi ${counter++}")
         btn_settings.isChecked = data.isShowMenu
         if(data.isShowMenu) submenu.open() else submenu.close()
 
@@ -114,6 +118,7 @@ class RootActivity : AppCompatActivity() {
         tv_text_content.text = if(!data.isLoadingContent || data.content.size == 0) "loading..." else data.content.first() as String
 
         toolbar.title = data.title ?: "loading..."
+//        toolbar.subtitle = data.author?.let{ it as String ?: "noname..."}
         toolbar.subtitle = data.category ?: "loading"
         if(data.categoryIcon != null)toolbar.logo = getDrawable(data.categoryIcon as Int)
 
@@ -135,5 +140,8 @@ class RootActivity : AppCompatActivity() {
             logo.layoutParams = it
         }
 
+    }
+    companion object{
+        private var counter : Int = 0
     }
 }
