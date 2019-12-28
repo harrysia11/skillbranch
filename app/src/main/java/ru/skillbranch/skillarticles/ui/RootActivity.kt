@@ -54,19 +54,24 @@ class RootActivity : AppCompatActivity() {
     private fun renderNotification(notify: Notify) {
         val snackbar:Snackbar = Snackbar.make(coordinator_container,notify.message,Snackbar.LENGTH_LONG)
             .setAnchorView(bottombar)
-            .setActionTextColor(getColor(R.color.color_accent))
+
             when(notify){
                 is Notify.TextMessage -> {}
+
                 is Notify.ActionMessage -> {
+                    snackbar.setActionTextColor(getColor(R.color.color_accent_dark))
                     snackbar.setAction(notify.actionLabel){
                         notify.actionHandler?.invoke()
                     }
                 }
                 is Notify.ErrorMessage -> {
-                    snackbar.setAction(notify.errLabel){
-                        notify.errHandler?.invoke()
+                     with(snackbar){   setBackgroundTint(getColor(R.color.design_default_color_error))
+                         setTextColor(getColor(android.R.color.white))
+                         setActionTextColor(getColor(android.R.color.white))
+                         setAction(notify.errLabel){
+                             notify.errHandler?.invoke()
+                         }
                     }
-                    snackbar.setTextColor(getColor(R.color.design_default_color_error))
                 }
             }
         snackbar.show()
@@ -74,14 +79,9 @@ class RootActivity : AppCompatActivity() {
 
     private fun setupSubmenu() {
 
-        btn_text_up.setOnClickListener{
-            viewModel.handleUpText()
-        }
+        btn_text_up.setOnClickListener{viewModel.handleUpText() }
         btn_text_down.setOnClickListener { viewModel.handleDownText() }
-        switch_mode.setOnClickListener { viewModel.handleNightMode()
-
-                                        }
-
+        switch_mode.setOnClickListener { viewModel.handleNightMode() }
     }
 
     private fun setupBottonbar() {
@@ -115,7 +115,7 @@ class RootActivity : AppCompatActivity() {
             btn_text_down.isChecked = true
         }
 
-        tv_text_content.text = if(!data.isLoadingContent || data.content.size == 0) "loading..." else data.content.first() as String
+        tv_text_content.text = if(!data.isLoadingContent || data.content.isEmpty()) "long long text content..." else data.content.first() as String
 
         toolbar.title = data.title ?: "loading..."
 //        toolbar.subtitle = data.author?.let{ it as String ?: "noname..."}

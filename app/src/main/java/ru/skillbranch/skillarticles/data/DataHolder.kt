@@ -38,7 +38,7 @@ object LocalDataHolder {
     fun findArticlePersonalInfo(articleId: String): LiveData<ArticlePersonalInfo?> {
         GlobalScope.launch {
             if (isDalay) delay(1000)
-            articleInfo.postValue(ArticlePersonalInfo(isBookmark = false))
+            articleInfo.postValue(ArticlePersonalInfo(isBookmark = true))
         }
         return articleInfo
     }
