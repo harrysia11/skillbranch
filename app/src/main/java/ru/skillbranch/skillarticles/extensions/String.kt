@@ -1,17 +1,17 @@
-package ru.skillbranch.skillarticles.extensions.data
+package ru.skillbranch.skillarticles.extensions
 
-fun String.indexesOf(pattern:String): List<Int>{
+fun String?.indexesOf(pattern:String, ignoreCase: Boolean = true): List<Int>{
 
     val listSet:MutableList<Int> = mutableListOf()
     var wholeLength = 0
     var position = 0
 
-    if(pattern.isNullOrBlank()) return listSet
+    if(this.isNullOrBlank() || pattern.isNullOrBlank()) return listSet
 
     val list = this.split(" ")
     for(element in list){
 
-        position = element.indexOf(pattern,0,true)
+        position = element.indexOf(pattern,0,ignoreCase)
         if(position > -1) {
             listSet.add(wholeLength + position)
         }// adding gap between words

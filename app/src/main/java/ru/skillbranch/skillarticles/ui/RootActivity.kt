@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.SearchView
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.text.getSpans
@@ -46,10 +47,10 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
     }
 
-    override val binding: ArticleBinding by lazy { ArticleBinding() }
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED) public override val binding: ArticleBinding by lazy { ArticleBinding() }
 
-    private val bgColor by AttrValue(R.attr.colorSecondary)
-    private val fgColor by AttrValue(R.attr.colorOnSecondary)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE) val bgColor by AttrValue(R.attr.colorSecondary)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE) val fgColor by AttrValue(R.attr.colorOnSecondary)
 
 
     override fun setupViews() {
