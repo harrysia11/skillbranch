@@ -43,4 +43,61 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Group
+                android:id="@+id/group_bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="btn_bookmark,btn_like,btn_settings,btn_share"
+            tools:visibility="gone">
+
+        </androidx.constraintlayout.widget.Group>
+
+        <LinearLayout
+            android:id="@+id/reveal"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/color_on_article_bar"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
+
+                <ImageView
+                    style="@style/BottombarSearchIcon"
+                    android:id="@+id/btn_search_close"
+                    android:src="@drawable/ic_close_black_24dp"
+                    tools:tint="@android:color/white"/>
+                <TextView
+                    android:id="@+id/tv_search_result"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="16dp"
+                    android:text="Not found"
+                    android:textColor="?attr/colorPrimary"
+                    tools:textColor="@android:color/white"/>
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="?attr/actionBarSize"
+                    android:layout_weight="1"/>
+                        
+
+                <ImageView
+                    style="@style/BottombarSearchIcon"
+                    android:id="@+id/btn_result_down"
+                    android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+                    tools:tint="@android:color/white"/>
+                <ImageView
+                    style="@style/BottombarSearchIcon"
+                    android:id="@+id/btn_result_up"
+                    android:src="@drawable/ic_keyboard_arrow_up_black_24dp"
+                    tools:tint="@android:color/white"/>
+
+        </LinearLayout>
+
+
 </merge>
