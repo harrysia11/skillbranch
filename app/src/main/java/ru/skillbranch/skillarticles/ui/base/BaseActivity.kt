@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.ui.Base
+package ru.skillbranch.skillarticles.ui.base
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

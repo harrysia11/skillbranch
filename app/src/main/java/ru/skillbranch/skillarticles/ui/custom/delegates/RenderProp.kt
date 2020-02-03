@@ -1,7 +1,7 @@
 package ru.skillbranch.skillarticles.ui.custom.delegates
 
 import android.util.Log
-import ru.skillbranch.skillarticles.ui.Base.Binding
+import ru.skillbranch.skillarticles.ui.base.Binding
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
