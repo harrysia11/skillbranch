@@ -2,9 +2,9 @@ package ru.skillbranch.skillarticles.ui.Base
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import ru.skillbranch.skillarticles.viewmodels.Base.BaseViewModel
-import ru.skillbranch.skillarticles.viewmodels.Base.IViewModelState
-import ru.skillbranch.skillarticles.viewmodels.Base.Notify
+import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
+import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
 abstract class BaseActivity<T: BaseViewModel<out IViewModelState>> : AppCompatActivity(){
 

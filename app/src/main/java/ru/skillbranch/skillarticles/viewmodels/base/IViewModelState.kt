@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.viewmodels.Base
+package ru.skillbranch.skillarticles.viewmodels.base
 
 import android.os.Bundle
 

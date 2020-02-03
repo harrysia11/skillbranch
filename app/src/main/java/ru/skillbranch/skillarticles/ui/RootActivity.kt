@@ -33,9 +33,9 @@ import ru.skillbranch.skillarticles.ui.custom.delegates.ObserveProp
 import ru.skillbranch.skillarticles.ui.custom.delegates.RenderProp
 import ru.skillbranch.skillarticles.viewmodels.ArticleState
 import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
-import ru.skillbranch.skillarticles.viewmodels.Base.IViewModelState
-import ru.skillbranch.skillarticles.viewmodels.Base.Notify
-import ru.skillbranch.skillarticles.viewmodels.Base.ViewModelFactory
+import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.Notify
+import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 
 class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 

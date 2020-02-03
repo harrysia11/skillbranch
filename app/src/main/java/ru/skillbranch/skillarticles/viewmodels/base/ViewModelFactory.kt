@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.viewmodels.Base
+package ru.skillbranch.skillarticles.viewmodels.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
