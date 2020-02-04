@@ -28,9 +28,9 @@ import ru.skillbranch.skillarticles.ui.base.BaseActivity
 import ru.skillbranch.skillarticles.ui.base.Binding
 import ru.skillbranch.skillarticles.ui.custom.SearchFocusSpan
 import ru.skillbranch.skillarticles.ui.custom.SearchSpan
-import ru.skillbranch.skillarticles.ui.custom.delegates.AttrValue
-import ru.skillbranch.skillarticles.ui.custom.delegates.ObserveProp
-import ru.skillbranch.skillarticles.ui.custom.delegates.RenderProp
+import ru.skillbranch.skillarticles.ui.delegates.AttrValue
+import ru.skillbranch.skillarticles.ui.delegates.ObserveProp
+import ru.skillbranch.skillarticles.ui.delegates.RenderProp
 import ru.skillbranch.skillarticles.viewmodels.ArticleState
 import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
@@ -49,8 +49,12 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED) public override val binding: ArticleBinding by lazy { ArticleBinding() }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE) val bgColor by AttrValue(R.attr.colorSecondary)
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE) val fgColor by AttrValue(R.attr.colorOnSecondary)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE) val bgColor by AttrValue(
+        R.attr.colorSecondary
+    )
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE) val fgColor by AttrValue(
+        R.attr.colorOnSecondary
+    )
 
 
     override fun setupViews() {
@@ -314,22 +318,36 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
          var isFocusedSearch: Boolean = false
          var searchQuery: String? = null
 
-         private var isLoadingContent by ObserveProp(true){
-             Log.e("ArticleBinding","isLoadingContent = $it")
+         private var isLoadingContent by ObserveProp(true) {
+             Log.e("ArticleBinding", "isLoadingContent = $it")
          }
 
-         private var isLike: Boolean by RenderProp(false){btn_like.isChecked = it}
-         private var isBookmark: Boolean by RenderProp(false){btn_bookmark.isChecked = it}
-         private var isShowMenu: Boolean by RenderProp(false){
+         private var isLike: Boolean by RenderProp(false) {
+             btn_like.isChecked = it
+         }
+         private var isBookmark: Boolean by RenderProp(
+             false
+         ) { btn_bookmark.isChecked = it }
+         private var isShowMenu: Boolean by RenderProp(
+             false
+         ) {
              btn_settings.isChecked = it
-            if(it) submenu.open() else submenu.close()
+             if (it) submenu.open() else submenu.close()
          }
 
-         private var title: String by RenderProp("loading"){ toolbar.title = it}
-         private var category: String by RenderProp("loading"){ toolbar.subtitle = it}
-         private var categoryIcon: Int by RenderProp(R.drawable.logo_placeholder){toolbar.logo = getDrawable(it)}
+         private var title: String by RenderProp("loading") {
+             toolbar.title = it
+         }
+         private var category: String by RenderProp("loading") {
+             toolbar.subtitle = it
+         }
+         private var categoryIcon: Int by RenderProp(R.drawable.logo_placeholder) {
+             toolbar.logo = getDrawable(it)
+         }
 
-         private var isBigText: Boolean by RenderProp(false) {
+         private var isBigText: Boolean by RenderProp(
+             false
+         ) {
              if (it) {
                  tv_text_content.textSize = 18f
                  btn_text_up.isChecked = true
@@ -341,22 +359,28 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
              }
          }
 
-         private var isDarkMode :Boolean by RenderProp(false,false){
+         private var isDarkMode :Boolean by RenderProp(
+             false,
+             false
+         ) {
              switch_mode.isChecked = it
-             delegate.localNightMode = if(it) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+             delegate.localNightMode =
+                 if (it) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
          }
 
-        var isSearch : Boolean by ObserveProp(false){
-            if(it) showSearchBar() else hideSearchBar()
+        var isSearch : Boolean by ObserveProp(false) {
+            if (it) showSearchBar() else hideSearchBar()
         }
 
-         private var searchResult: List<Pair<Int,Int>> by ObserveProp(emptyList())
+         private var searchResult: List<Pair<Int,Int>> by ObserveProp(
+             emptyList()
+         )
          {
-          //   if(it != null && it.isNotEmpty()) renderSearchResult(it)
+             //   if(it != null && it.isNotEmpty()) renderSearchResult(it)
          }
          private var searchPosition: Int by ObserveProp(0)
 
-         private var content: String by ObserveProp("loading"){
+         private var content: String by ObserveProp("loading") {
              tv_text_content.setText(it, TextView.BufferType.SPANNABLE)
              tv_text_content.movementMethod = ScrollingMovementMethod()
          }
