@@ -21,7 +21,7 @@ abstract class Binding {
         vararg  fields: KProperty<*>,
         onChange: (A,B,C,D) -> Unit
     ){
-
+        @Suppress("UNCHECKED_CAST")
         check(fields.size ==4 ){"Names size must be 4, current ${fields.size}"}
         val names = fields.map { it.name }
         Log.e("class Binding dependsOn","${names.toString()}")

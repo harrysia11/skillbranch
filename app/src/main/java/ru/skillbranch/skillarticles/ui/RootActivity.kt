@@ -63,7 +63,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
         setupSubmenu()
     }
 
-    override fun renderSearchResult(searchResult: List<Pair<Int, Int>>) {
+    override fun renderSearchResult(searchResults: List<Pair<Int, Int>>) {
         val content = tv_text_content.text as Spannable
 
      //   Log.e("renderSearchResult", "${binding.isSearch}")
@@ -73,7 +73,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
         clearSearchResult()
 
-        searchResult.forEach {
+        searchResults.forEach {
                 (start, end) ->
                     content.setSpan(
                     SearchSpan(bgColor, fgColor),
@@ -372,7 +372,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
             if (it) showSearchBar() else hideSearchBar()
         }
 
-         private var searchResult: List<Pair<Int,Int>> by ObserveProp(
+         private var searchResults: List<Pair<Int,Int>> by ObserveProp(
              emptyList()
          )
          {
@@ -390,7 +390,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
              dependsOn<Boolean,Boolean,List<Pair<Int,Int>>,Int>(
                  ::isLoadingContent,
                  ::isSearch,
-                 ::searchResult,
+                 ::searchResults,
                  ::searchPosition
              ){
                  ilc,iss, sr, sp ->
@@ -423,7 +423,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
              isSearch = data.isSearch
              searchQuery = data.searchQuery
              searchPosition = data.searchPosition
-             searchResult = data.searchResult
+             searchResults = data.searchResults
              if(data.content.isNotEmpty()) content = data.content.first() as String
 
          }

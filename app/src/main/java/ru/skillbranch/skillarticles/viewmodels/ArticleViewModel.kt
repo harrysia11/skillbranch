@@ -146,10 +146,10 @@ class ArticleViewModel(
 
     override fun handleSearch(query: String?) {
         query ?: return
-        val result = (currentState.content.firstOrNull() as? String ?: "").indexesOf(query)
+        val results = (currentState.content.firstOrNull() as? String ?: "").indexesOf(query)
             .map{ it to it + query.length}
 //        updateState { it.copy(searchQuery = query,searchResult = result) }
-        updateState { it.copy(searchQuery = query,searchResult = result, searchPosition = 0) }
+        updateState { it.copy(searchQuery = query,searchResults = results, searchPosition = 0) }
     }
 
     fun handleUpResult() {
@@ -174,7 +174,7 @@ data class ArticleState(
     val isDarkMode: Boolean = false,
     val isSearch: Boolean = false,
     val searchQuery: String? = null,
-    val searchResult: List<Pair<Int, Int>> = emptyList(),
+    val searchResults: List<Pair<Int, Int>> = emptyList(),
     val searchPosition: Int = 0,
     val shareLink: String? = null,
     val title: String? = null,
@@ -191,7 +191,7 @@ data class ArticleState(
             bundleOf(
                "isSearch" to isSearch,
                 "searchQuery" to searchQuery,
-                "searchResult" to searchResult,
+                "searchResults" to searchResults,
                 "searchPosition" to searchPosition
             )
         )
@@ -201,7 +201,7 @@ data class ArticleState(
         return copy(
             isSearch = saveState["isSearch"] as Boolean,
             searchQuery = saveState["searchQuery"] as String?,
-            searchResult = saveState["searchResult"] as List<Pair<Int,Int>>,
+            searchResults = saveState["searchResults"] as List<Pair<Int,Int>>,
             searchPosition = saveState["searchPosition"] as Int
         )
 
