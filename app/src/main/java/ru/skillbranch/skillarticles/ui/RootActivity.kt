@@ -233,11 +233,13 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
         btn_result_up.setOnClickListener {
             if(search_view != null && search_view.hasFocus()) search_view.clearFocus()
+            if(!tv_text_content.hasFocus()) tv_text_content.requestFocus()
             viewModel.handleUpResult()
         }
 
         btn_result_down.setOnClickListener {
             if(search_view != null && search_view.hasFocus()) search_view.clearFocus()
+            if(!tv_text_content.hasFocus()) tv_text_content.requestFocus()
             viewModel.handleDownResult()
         }
 
@@ -424,7 +426,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
              searchQuery = data.searchQuery
              searchPosition = data.searchPosition
              searchResults = data.searchResults
-             if(data.content.isNotEmpty()) content = data.content.first() as String
+             if(data.content != null) content = data.content as String
 
          }
 
