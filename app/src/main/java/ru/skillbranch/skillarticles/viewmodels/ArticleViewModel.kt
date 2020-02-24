@@ -148,7 +148,6 @@ class ArticleViewModel(
         query ?: return
         val results = (currentState.content).indexesOf(query)
             .map{ it to it + query.length}
-//        updateState { it.copy(searchQuery = query,searchResult = result) }
         updateState { it.copy(searchQuery = query,searchResults = results, searchPosition = 0) }
     }
 

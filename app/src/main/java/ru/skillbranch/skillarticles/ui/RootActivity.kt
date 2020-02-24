@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.text.Selection
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.method.ScrollingMovementMethod
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -15,7 +15,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.text.getSpans
-import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.layout_bottombar.*
@@ -24,6 +23,7 @@ import kotlinx.android.synthetic.main.search_view_layout.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.setMarginOptionally
+import ru.skillbranch.skillarticles.markdown.MarkdownBuilder
 import ru.skillbranch.skillarticles.ui.base.BaseActivity
 import ru.skillbranch.skillarticles.ui.base.Binding
 import ru.skillbranch.skillarticles.ui.custom.SearchFocusSpan
@@ -35,17 +35,17 @@ import ru.skillbranch.skillarticles.viewmodels.ArticleState
 import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
-import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 
 class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
     override val layout: Int = R.layout.activity_root
-    override val viewModel: ArticleViewModel by lazy{
-
-        val vmFactory = ViewModelFactory("0")
-        ViewModelProviders.of(this,vmFactory).get(ArticleViewModel::class.java)
-
-    }
+    override val viewModel: ArticleViewModel by provideViewModel("0")
+//    override val viewModel: ArticleViewModel by lazy{
+//
+//        val vmFactory = ViewModelFactory("0")
+//        ViewModelProviders.of(this,vmFactory).get(ArticleViewModel::class.java)
+//
+//    }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED) public override val binding: ArticleBinding by lazy { ArticleBinding() }
 
@@ -383,8 +383,14 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
          private var searchPosition: Int by ObserveProp(0)
 
          private var content: String by ObserveProp("loading") {
-             tv_text_content.setText(it, TextView.BufferType.SPANNABLE)
-             tv_text_content.movementMethod = ScrollingMovementMethod()
+
+             MarkdownBuilder(this@RootActivity)
+                 .markdownToSpan(it)
+                 .run {
+                     tv_text_content.setText(this, TextView.BufferType.SPANNABLE)
+                 }
+         //    tv_text_content.setText(it, TextView.BufferType.SPANNABLE)
+             tv_text_content.movementMethod = LinkMovementMethod.getInstance()
          }
 
          override fun onFinishInflate() {
@@ -426,7 +432,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
              searchQuery = data.searchQuery
              searchPosition = data.searchPosition
              searchResults = data.searchResults
-             if(data.content != null) content = data.content as String
+             if(data.content != null) content = data.content
 
          }
 

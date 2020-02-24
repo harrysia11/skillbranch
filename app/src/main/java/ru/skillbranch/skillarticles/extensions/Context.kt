@@ -1,10 +1,12 @@
 package ru.skillbranch.skillarticles.extensions
 
 import android.content.Context
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.TypedValue
+import androidx.core.content.ContextCompat
 
 fun Context.dpToPx(dp: Int): Float {
     return TypedValue.applyDimension(
@@ -37,3 +39,12 @@ val Context.isNetworkAvailable: Boolean
             cm.activeNetworkInfo?.run { isConnectedOrConnecting } ?: false
         }
     }
+
+fun Context.attrValue(color: Int): Int {
+
+    val typedValue = TypedValue()
+    return if (getTheme().resolveAttribute(color, typedValue, true)) {
+        ContextCompat.getColor(this, typedValue.resourceId)
+    } else
+        Color.BLACK
+}
