@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.markdown
 
+import android.util.Log
 import java.util.regex.Pattern
 
 object MarkdownParser {
@@ -21,15 +22,30 @@ object MarkdownParser {
     private val elementsPattern by lazy { Pattern.compile(MARKDOWN_GROUPS,Pattern.MULTILINE) }
 
     fun parse(string : String) : MarkdownText{
-
         val elements = mutableListOf<Element>()
         elements.addAll(findElements(string))
-        return MarkdownText(elements)
 
+        return MarkdownText(elements)
     }
 
-    fun clear(string: String): String?{
-        return null
+    fun clear(string: String?): String?{
+        string ?: return null
+        var wholeText = ""
+        val elements = mutableListOf<Element>()
+        elements.addAll(findElements(string))
+        //
+        for(element in elements){
+            if(element.elements.isEmpty()){
+                wholeText += element.text
+            }
+            for(innerElement in element.elements){
+                wholeText += innerElement.text
+            }
+        }
+        //
+        Log.e("wholeText",wholeText)
+
+        return wholeText
     }
 
     private fun findElements(string: CharSequence): List<Element>{
@@ -70,7 +86,6 @@ object MarkdownParser {
                     parents.add(element)
 
                     lastStartIndex = endIndex
-
                 }
                 2 -> {
                     val reg = "^#{1,6}".toRegex().find(string.subSequence(startIndex,endIndex))
@@ -81,7 +96,6 @@ object MarkdownParser {
 
                     parents.add(element)
                     lastStartIndex = endIndex
-
                 }
                 // QUOTE
                 3 -> {
@@ -92,7 +106,6 @@ object MarkdownParser {
 
                     parents.add(element)
                     lastStartIndex = endIndex
-
                 }
                 // italic
                 4 -> {
@@ -103,7 +116,6 @@ object MarkdownParser {
 
                     parents.add(element)
                     lastStartIndex = endIndex
-
                 }
                 // bold
                 5 -> {
@@ -114,7 +126,6 @@ object MarkdownParser {
 
                     parents.add(element)
                     lastStartIndex = endIndex
-
                 }
                 // strike
                 6 -> {
@@ -125,7 +136,6 @@ object MarkdownParser {
 
                     parents.add(element)
                     lastStartIndex = endIndex
-
                 }
                 // rule
                 7 -> {
@@ -143,7 +153,6 @@ object MarkdownParser {
 
                     parents.add(element)
                     lastStartIndex = endIndex
-
                 }
                 // link
                 9 -> {
@@ -153,7 +162,6 @@ object MarkdownParser {
 
                     parents.add(element)
                     lastStartIndex = endIndex
-
                 }
 
             }
@@ -163,6 +171,7 @@ object MarkdownParser {
             val text = string.subSequence(lastStartIndex, string.length)
             parents.add(Element.Text(text))
         }
+
         return parents
     }
 }

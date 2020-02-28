@@ -13,7 +13,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.*
-import ru.skillbranch.skillarticles.markdown.span.*
+import ru.skillbranch.skillarticles.markdown.spans.*
 
 
 /**

@@ -11,6 +11,7 @@ import ru.skillbranch.skillarticles.extensions.data.toAppSettings
 import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
 import ru.skillbranch.skillarticles.extensions.format
 import ru.skillbranch.skillarticles.extensions.indexesOf
+import ru.skillbranch.skillarticles.markdown.MarkdownParser
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
@@ -146,7 +147,10 @@ class ArticleViewModel(
 
     override fun handleSearch(query: String?) {
         query ?: return
-        val results = (currentState.content).indexesOf(query)
+        //
+        val cleanString = MarkdownParser.clear(currentState.content)
+        //
+        val results = (cleanString).indexesOf(query)
             .map{ it to it + query.length}
         updateState { it.copy(searchQuery = query,searchResults = results, searchPosition = 0) }
     }

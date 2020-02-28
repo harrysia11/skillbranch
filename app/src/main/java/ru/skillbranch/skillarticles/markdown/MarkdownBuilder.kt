@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Typeface
 import android.text.SpannableStringBuilder
 import android.text.SpannedString
+import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.URLSpan
 import androidx.core.text.buildSpannedString
@@ -11,7 +12,8 @@ import androidx.core.text.inSpans
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.attrValue
 import ru.skillbranch.skillarticles.extensions.dpToPx
-import ru.skillbranch.skillarticles.markdown.span.*
+import ru.skillbranch.skillarticles.markdown.spans.*
+
 
 class MarkdownBuilder(
     context: Context
@@ -79,6 +81,14 @@ class MarkdownBuilder(
                         }
                     }
                 }
+                is Element.Strike ->{
+                    inSpans(StrikethroughSpan()){
+                        for( child in element.elements){
+                            buildElement(child, builder)
+                        }
+                    }
+                }
+
                 is Element.Bold ->{
                     inSpans(StyleSpan(Typeface.BOLD)){
                         for( child in element.elements){
