@@ -8,7 +8,6 @@ import android.text.style.ReplacementSpan
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.annotation.VisibleForTesting
-import ru.skillbranch.skillarticles.markdown.Element
 
 
 class BlockCodeSpan(
@@ -19,8 +18,9 @@ class BlockCodeSpan(
     @Px
     private val cornerRadius: Float,
     @Px
-    private val padding: Float,
-    private val type: Element.BlockCode.Type
+    private val padding: Float
+//    ,
+//    private val type: Element.BlockCode.Type
 ) : ReplacementSpan() {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var rect = RectF()
