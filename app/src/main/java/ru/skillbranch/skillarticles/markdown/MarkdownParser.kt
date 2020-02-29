@@ -119,7 +119,7 @@ object MarkdownParser {
                 }
                 // bold
                 5 -> {
-                    text = string.subSequence(startIndex.plus(2), endIndex.minus(2))
+                    text = string.subSequence(startIndex.plus(2), endIndex.plus(-2))
 
                     val sub = findElements(text)
                     val element = Element.Bold(text, sub)

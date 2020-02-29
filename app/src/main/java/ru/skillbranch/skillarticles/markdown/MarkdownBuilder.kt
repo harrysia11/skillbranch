@@ -21,7 +21,7 @@ class MarkdownBuilder(
 
     private  val gap: Float = context.dpToPx(8)
     private val bulletRadius = context.dpToPx(4)
-    private val quoteWidth = context.dpToPx(4)
+    private val quoteWidth = context.dpToPx(8)
     private val colorSecondary =  context.attrValue(R.attr.colorSecondary) // context.getColor(R.color.design_default_color_secondary)
     private val colorPrimary = context.attrValue(R.attr.colorPrimary)
     private val colorSurface = context.attrValue(R.attr.colorSurface)
@@ -103,7 +103,10 @@ class MarkdownBuilder(
                 }
                 is Element.InlineCode ->{
                     inSpans(InlineCodeSpan(colorOnSurface,colorSurface,cornerRadius,gap )){
-                        append(element.text)
+   //                     append(element.text)
+                        for( child in element.elements) {
+                            buildElement(child, builder)
+                        }
                     }
                 }
                 is Element.Link ->{
@@ -112,7 +115,10 @@ class MarkdownBuilder(
                         URLSpan(element.link)
                     )
                     {
-                        append((element.text))
+  //                      append((element.text))
+                        for( child in element.elements) {
+                            buildElement(child, builder)
+                        }
                     }
                 }
                 else -> append(element.text)
