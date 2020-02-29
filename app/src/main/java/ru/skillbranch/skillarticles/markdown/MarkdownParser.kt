@@ -35,17 +35,29 @@ object MarkdownParser {
         elements.addAll(findElements(string))
         //
         for(element in elements){
-            if(element.elements.isEmpty()){
-                wholeText += element.text
-            }
-            for(innerElement in element.elements){
-                wholeText += innerElement.text
-            }
+
+            wholeText += getInnerText(element)
+//            if(element.elements.isEmpty()){
+//                wholeText += element.text
+//            }
+//            for(innerElement in element.elements){
+//                wholeText += innerElement.text
+//            }
         }
         //
         Log.e("wholeText",wholeText)
 
         return wholeText
+    }
+
+    fun getInnerText(element: Element): String {
+        if (element.elements.isEmpty()) {
+            return element.text.toString()
+        }
+        for (innerElement in element.elements) {
+            return getInnerText(innerElement)
+        }
+        return ""
     }
 
     private fun findElements(string: CharSequence): List<Element>{
