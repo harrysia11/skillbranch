@@ -46,6 +46,7 @@ class BlockquotesSpan(
 
         color = lineColor
         style = Paint.Style.FILL
+        strokeWidth = quoteWidth
 
         block()
 
