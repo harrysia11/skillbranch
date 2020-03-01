@@ -50,10 +50,6 @@ Unordered list can use double asterisks or double underscores for emphasis aka b
 Use minuses for list item and underscores and asterisks for emphasis aka italic
 Or use plus for list item and double tildes for strike
 
-First ordered list item
-Second item
-Third item.
-
 Blockquotes are very handy in email to emulate reply text.
 This line is part of the same quote.
 
