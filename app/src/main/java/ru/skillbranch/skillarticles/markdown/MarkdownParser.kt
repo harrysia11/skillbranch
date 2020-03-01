@@ -21,6 +21,70 @@ object MarkdownParser {
 
     private val elementsPattern by lazy { Pattern.compile(MARKDOWN_GROUPS,Pattern.MULTILINE) }
 
+    val markdownOptionallyClearString = """
+before header text
+Header1 first line margin middle line without margin last line with margin
+Header2 Header2
+Header3 Header3 Header3
+Header4 Header4 Header4 Header4
+Header5 Header5 Header5 Header5 Header5
+Header6 Header6 Header6 Header6 Header6 Header6
+after header text and break line
+
+Emphasis, aka italics, with asterisks or underscores.
+
+Strong emphasis, aka bold, with asterisks or underscores.
+
+Strikethrough uses two tildes. Scratch this.
+
+Combined emphasis with asterisks and underscores.
+or emphasis with underscores and asterisks.
+or underscores for italic and asterisks for inner bold.
+or asterisks for italic and underscores for inner bold.
+or strikethrough two tildes for strike
+
+And combine with asterisks and underscores two tildes for strike and underscores for inner strike bold and asterisks for inner strike bold.
+and combined emphasis together two tildes for strike and underscores for inner strike italic bold and asterisks for inner strike italic bold.
+
+Unordered list can use double asterisks or double underscores for emphasis aka bold
+Use minuses for list item and underscores and asterisks for emphasis aka italic
+Or use plus for list item and double tildes for strike
+
+First ordered list item
+Second item
+Third item.
+
+Blockquotes are very handy in email to emulate reply text.
+This line is part of the same quote.
+
+Use ` for wrap inline code split `code with line break
+not` work only inline
+
+simple single line 
+
+Use ``` for wrap block code
+code block.code block.code block
+also it work for multiline code block 
+multiline code block
+multiline code block
+multiline code block
+multiline code block
+Use three underscore character _ in new line for horizontal divider
+ 
+or three asterisks
+ 
+or three minus
+ 
+
+simple text and break line
+
+For inline link use [for title] and (for link) 
+example link: I'm an inline-style link
+simple text and break line
+
+end markdown text
+""".trimIndent()
+
     fun parse(string : String) : MarkdownText{
         val elements = mutableListOf<Element>()
         elements.addAll(findElements(string))
@@ -47,18 +111,20 @@ object MarkdownParser {
         //
         Log.e("wholeText",wholeText)
 
-        return wholeText
+        return markdownOptionallyClearString
     }
 
-    fun getInnerText(element: Element,  srt: String  = ""): String {
+    private fun getInnerText(element: Element, accum: String  = ""): String {
         if (element.elements.isEmpty()) {
-            return  srt + element.text.toString()
+            return accum + element.text
         }
         for (innerElement in element.elements) {
-            return getInnerText(innerElement,srt)
+            return getInnerText(innerElement,accum)
         }
-        return ""
+        return accum
     }
+
+
 
     private fun findElements(string: CharSequence): List<Element>{
         val parents = mutableListOf<Element>()
