@@ -50,12 +50,12 @@ object MarkdownParser {
         return wholeText
     }
 
-    fun getInnerText(element: Element): String {
+    fun getInnerText(element: Element,  srt: String  = ""): String {
         if (element.elements.isEmpty()) {
-            return element.text.toString()
+            return  srt + element.text.toString()
         }
         for (innerElement in element.elements) {
-            return getInnerText(innerElement)
+            return getInnerText(innerElement,srt)
         }
         return ""
     }
