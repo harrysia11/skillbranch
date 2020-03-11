@@ -7,11 +7,12 @@ import androidx.lifecycle.LiveData
 import ru.skillbranch.skillarticles.data.ArticleData
 import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
+import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
+import ru.skillbranch.skillarticles.data.repositories.clearContent
 import ru.skillbranch.skillarticles.extensions.data.toAppSettings
 import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
 import ru.skillbranch.skillarticles.extensions.format
 import ru.skillbranch.skillarticles.extensions.indexesOf
-import ru.skillbranch.skillarticles.markdown.MarkdownParser
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
@@ -22,6 +23,7 @@ class ArticleViewModel(
 
     private val repository = ArticleRepository
     private val TAG : String = "ArticleViewModel"
+    private var clearContent: String? = null
 
     init {
 
@@ -66,7 +68,7 @@ class ArticleViewModel(
     /**
      * load data from network
      */
-    override fun getArticleContent(): LiveData<String?> {
+    override fun getArticleContent(): LiveData<List<MarkdownElement>?> {
         return repository.loadArticleContent(articleId)
     }
 
@@ -148,9 +150,11 @@ class ArticleViewModel(
     override fun handleSearch(query: String?) {
         query ?: return
         //
-        val cleanString = MarkdownParser.clear(currentState.content)
-        //
-        val results = (cleanString).indexesOf(query)
+        if(clearContent == null && currentState.content.isNotEmpty()) {
+            clearContent = currentState.content.clearContent()
+        }
+
+        val results = clearContent.indexesOf(query)
             .map{ it to it + query.length}
         updateState { it.copy(searchQuery = query,searchResults = results, searchPosition = 0) }
     }
@@ -184,9 +188,9 @@ data class ArticleState(
     val category: String? = null,
     val categoryIcon: Any? = null,
     val date: String? = null,
-    val author :Any? = null,
+    val author:Any? = null,
     val poster: String? = null,
-    internal val content: String? = null,
+    val content: List<MarkdownElement> = emptyList(),
     val reviews: List<Any> = emptyList()
 ): IViewModelState{
     override fun save(outState: Bundle) {

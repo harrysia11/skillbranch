@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.text.Selection
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.SearchView
-import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
@@ -21,13 +19,13 @@ import kotlinx.android.synthetic.main.layout_bottombar.*
 import kotlinx.android.synthetic.main.layout_submenu.*
 import kotlinx.android.synthetic.main.search_view_layout.*
 import ru.skillbranch.skillarticles.R
+import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.setMarginOptionally
-import ru.skillbranch.skillarticles.markdown.MarkdownBuilder
+import ru.skillbranch.skillarticles.markdown.spans.SearchFocusSpan
+import ru.skillbranch.skillarticles.markdown.spans.SearchSpan
 import ru.skillbranch.skillarticles.ui.base.BaseActivity
 import ru.skillbranch.skillarticles.ui.base.Binding
-import ru.skillbranch.skillarticles.ui.custom.SearchFocusSpan
-import ru.skillbranch.skillarticles.ui.custom.SearchSpan
 import ru.skillbranch.skillarticles.ui.delegates.AttrValue
 import ru.skillbranch.skillarticles.ui.delegates.ObserveProp
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
@@ -40,19 +38,16 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
     override val layout: Int = R.layout.activity_root
     override val viewModel: ArticleViewModel by provideViewModel("0")
-//    override val viewModel: ArticleViewModel by lazy{
-//
-//        val vmFactory = ViewModelFactory("0")
-//        ViewModelProviders.of(this,vmFactory).get(ArticleViewModel::class.java)
-//
-//    }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED) public override val binding: ArticleBinding by lazy { ArticleBinding() }
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    public override val binding: ArticleBinding by lazy { ArticleBinding() }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE) val bgColor by AttrValue(
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val bgColor by AttrValue(
         R.attr.colorSecondary
     )
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE) val fgColor by AttrValue(
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val fgColor by AttrValue(
         R.attr.colorOnSecondary
     )
 
@@ -64,32 +59,27 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
     }
 
     override fun renderSearchResult(searchResults: List<Pair<Int, Int>>) {
-        val content = tv_text_content.text as Spannable
-
-     //   Log.e("renderSearchResult", "${binding.isSearch}")
-
-    //    if(!binding.isSearch) return
-    //    if(content.toString() == "loading") return
-
-        clearSearchResult()
-
-        searchResults.forEach {
-                (start, end) ->
-                    content.setSpan(
-                    SearchSpan(bgColor, fgColor),
-                    start,
-                    end,
-                    SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
-
-            )
-        }
-        // autoscroll to the first position
-        renderSearchPosition(0)
-    }
+//        val content = tv_text_content.context as Spannable
+//
+//        clearSearchResult()
+//
+//        searchResults.forEach {
+//                (start, end) ->
+//                    content.setSpan(
+//                        SearchSpan(),
+//                    start,
+//                    end,
+//                    SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+//
+//            )
+//        }
+//        // autoscroll to the first position
+//        renderSearchPosition(0)
+   }
 
     override fun renderSearchPosition(searchPosition: Int) {
 
-        val content = tv_text_content.text as Spannable
+        val content = tv_text_content.context as Spannable
 
         val spans = content.getSpans<SearchSpan>()
         content.getSpans<SearchFocusSpan>().forEach { content.removeSpan(it) }
@@ -103,7 +93,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
                 content.getSpanStart(result)
             )
             content.setSpan(
-                SearchFocusSpan(bgColor, fgColor),
+                SearchFocusSpan(),
                 content.getSpanStart(result),
                 content.getSpanEnd(result),
                 SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -114,8 +104,8 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
     }
 
     override fun clearSearchResult() {
-        val content = tv_text_content.text as Spannable
-        content.getSpans<SearchSpan>().forEach { content.removeSpan(it) }
+ //       val content = tv_text_content.context as Spannable
+ //       content.getSpans<SearchSpan>().forEach { content.removeSpan(it) }
     }
 
     override fun showSearchBar() {
@@ -382,15 +372,10 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
          }
          private var searchPosition: Int by ObserveProp(0)
 
-         private var content: String by ObserveProp("loading") {
-
-             MarkdownBuilder(this@RootActivity)
-                 .markdownToSpan(it)
-                 .run {
-                     tv_text_content.setText(this, TextView.BufferType.SPANNABLE)
-                 }
-         //    tv_text_content.setText(it, TextView.BufferType.SPANNABLE)
-             tv_text_content.movementMethod = LinkMovementMethod.getInstance()
+         private var content: List<MarkdownElement> by ObserveProp(emptyList())
+         {
+             tv_text_content.isLoading = it.isEmpty()
+             tv_text_content.setContent(it)
          }
 
          override fun onFinishInflate() {
@@ -432,7 +417,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
              searchQuery = data.searchQuery
              searchPosition = data.searchPosition
              searchResults = data.searchResults
-             if(data.content != null) content = data.content
+             content = data.content
 
          }
 

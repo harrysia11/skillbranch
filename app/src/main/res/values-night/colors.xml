@@ -11,5 +11,6 @@
     <color name="color_article_bar">#121212</color>
     <color name="color_on_article_bar">#FFFFFF</color>
     <color name="color_divider">#1FFFFFFF</color>
+    <color name="opacity_color_surface">#1AFFFFFF</color>"
 
 </resources>
