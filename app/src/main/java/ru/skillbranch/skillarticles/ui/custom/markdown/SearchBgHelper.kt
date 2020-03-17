@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.markdown
+package ru.skillbranch.skillarticles.ui.custom.markdown
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -7,17 +7,27 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.text.Layout
 import android.text.Spanned
+import androidx.annotation.VisibleForTesting
 import androidx.core.graphics.ColorUtils
 import androidx.core.text.getSpans
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.*
-import ru.skillbranch.skillarticles.markdown.spans.HeaderSpan
-import ru.skillbranch.skillarticles.markdown.spans.SearchSpan
+import ru.skillbranch.skillarticles.ui.custom.spans.HeaderSpan
+import ru.skillbranch.skillarticles.ui.custom.spans.SearchFocusSpan
+import ru.skillbranch.skillarticles.ui.custom.spans.SearchSpan
 
-class SearchBgHelper (
-    context:Context,
-    private val focusListener: (Int) -> Unit
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+class SearchBgHelper(
+    context: Context,
+    private val focusListener: ((Int, Int) -> Unit)? = null,
+    mockDrawable: Drawable? = null
 ){
+
+    constructor(context: Context, focusListener: ((Int, Int) -> Unit)): this(
+        context,
+        focusListener,
+        null)
+
     private val padding: Int = context.dpToIntPx(4)
     private val radius: Float = context.dpToPx(8)
     private val boarderWidth: Int = context.dpToIntPx(1)
@@ -26,7 +36,7 @@ class SearchBgHelper (
     private val alphaColor: Int = ColorUtils.setAlphaComponent(secondaryColor,160)
 
     val drawable : Drawable by lazy{
-        GradientDrawable().apply {
+        mockDrawable ?: GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadii = FloatArray(8).apply { fill(radius,0,size) }
             color = ColorStateList.valueOf(alphaColor)
@@ -34,7 +44,7 @@ class SearchBgHelper (
         }
     }
     val drawableLeft : Drawable by lazy{
-        GradientDrawable().apply {
+        mockDrawable ?: GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadii = floatArrayOf(
                 radius,radius, // top left
@@ -47,14 +57,14 @@ class SearchBgHelper (
         }
     }
     val drawableMiddle : Drawable by lazy{
-        GradientDrawable().apply {
+        mockDrawable ?: GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             color = ColorStateList.valueOf(alphaColor)
             setStroke(boarderWidth,secondaryColor)
         }
     }
     val drawableRight : Drawable by lazy{
-        GradientDrawable().apply {
+        mockDrawable ?: GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadii = floatArrayOf(
                 0f,0f, // top left
@@ -101,11 +111,16 @@ class SearchBgHelper (
              layout: Layout
     ){
         spans = text.getSpans()
+
         spans.forEach {
             spanStart = text.getSpanStart(it)
             spanEnd = text.getSpanEnd(it)
             startLine = layout.getLineForOffset(spanStart)
             endLine = layout.getLineForOffset(spanEnd)
+
+            if(it is SearchFocusSpan){
+                focusListener?.invoke(layout.getLineTop(startLine), layout.getLineBottom(endLine))
+            }
 
             topExtraPadding = 0
             bottomExtraPadding = 0
@@ -209,6 +224,8 @@ class MultiLineRender(
         topExtraPadding: Int,
         bottomExtraPadding: Int
     ) {
+
+
         lineEndOffset = (layout.getLineRight(startLine) + padding).toInt()
         lineTop = getLineTop(layout, startLine) + topExtraPadding
         lineBottom = getLineBottom(layout,startLine)

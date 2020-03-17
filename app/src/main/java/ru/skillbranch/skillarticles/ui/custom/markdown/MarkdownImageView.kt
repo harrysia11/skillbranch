@@ -20,8 +20,6 @@ import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.attrValue
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.dpToPx
-import ru.skillbranch.skillarticles.markdown.IMarkdownView
-import ru.skillbranch.skillarticles.markdown.MarkdownTextView
 import java.nio.charset.Charset
 import java.security.MessageDigest
 import kotlin.math.hypot
@@ -47,9 +45,9 @@ class MarkdownImageView private constructor(
     private lateinit var imageUrl: String
     private lateinit var imageTitle: CharSequence
 
-    private val iv_image: ImageView
-    private val tv_title: MarkdownTextView
-    private var tv_alt: TextView? = null
+    public val iv_image: ImageView
+    public val tv_title: MarkdownTextView
+    public var tv_alt: TextView? = null
 
     @Px
     private val titleTopMargin: Int = context.dpToIntPx(8)//8dp
@@ -75,7 +73,7 @@ class MarkdownImageView private constructor(
 
     init {
 
-        setBackgroundColor(Color.RED)
+        //setBackgroundColor(Color.RED)
 
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 
@@ -149,7 +147,7 @@ class MarkdownImageView private constructor(
     }
 
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override public fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         var usedHeight = 0
         val width = View.getDefaultSize(suggestedMinimumWidth,widthMeasureSpec)
 
@@ -173,7 +171,7 @@ class MarkdownImageView private constructor(
         setMeasuredDimension(width, usedHeight)
     }
 
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+    override public fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         var used_height = 0
         val bodyWidth = r - l - paddingLeft - paddingRight
         val left = paddingLeft
@@ -202,7 +200,7 @@ class MarkdownImageView private constructor(
 
     }
 
-    override fun dispatchDraw(canvas: Canvas) {
+    override public fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
         canvas.drawLine(
             0f,

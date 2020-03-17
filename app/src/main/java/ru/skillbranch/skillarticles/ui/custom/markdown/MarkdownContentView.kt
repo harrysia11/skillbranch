@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.markdown
+package ru.skillbranch.skillarticles.ui.custom.markdown
 
 import android.content.Context
 import android.util.AttributeSet
@@ -8,8 +8,8 @@ import android.widget.TextView
 import androidx.core.view.children
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
+import ru.skillbranch.skillarticles.extensions.groupByBounds
 import ru.skillbranch.skillarticles.extensions.setPaddingOptionally
-import ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownImageView
 import kotlin.properties.Delegates
 
 class MarkdownContentView @JvmOverloads constructor(
@@ -87,7 +87,7 @@ class MarkdownContentView @JvmOverloads constructor(
                         }
                     addView(tv)
                 }
-                is MarkdownElement.Image -> {
+                is MarkdownElement.Image ->{
                     val iv = MarkdownImageView(
                         context,
                         textSize,
@@ -98,28 +98,66 @@ class MarkdownContentView @JvmOverloads constructor(
                     addView(iv)
                 }
                 is MarkdownElement.Scroll -> {
-                    // TODO
+                        val sv = MarkdownCodeView(
+                            context,
+                            textSize,
+                            it.blockCode.text
+                        )
+                        addView(sv)
+                    }
                 }
-
-            }
         }
     }
 
     fun renderSearchResult(searchResult: List<Pair<Int, Int>>) {
-        //TODO implement me
+        children.forEach {
+            view ->
+            view as IMarkdownView
+            view.clearSearchResult()
+        }
+        if(searchResult.isEmpty()) return
+
+        val bounds = elements.map{ it.bounds}
+        val result = searchResult.groupByBounds(bounds)
+
+        children.forEachIndexed { index, view ->
+            view as IMarkdownView
+            view.renderSearchResult(result[index], elements[index].offset)
+        }
     }
 
     fun renderSearchPosition(
         searchPosition: Pair<Int, Int>?
     ) {
-        //TODO implement me
+       searchPosition ?: return
+        val bounds = elements.map{
+            it.bounds
+        }
+
+        val index = bounds.indexOfFirst { (start, end)  ->
+            val boundRange = start..end
+            val ( startPos,endPos) = searchPosition
+            startPos in boundRange && endPos in boundRange
+        }
+
+        if(index == -1) return
+
+        val view = getChildAt(index)
+        view as IMarkdownView
+        view.renderSearchPosition(searchPosition, elements[index].offset)
+
     }
 
     fun clearSearchResult() {
-        //TODO implement me
+        children.forEach { view ->
+            view as IMarkdownView
+            view.clearSearchResult()
+        }
     }
 
     fun setCopyListener(listener: (String) -> Unit) {
         //TODO implement me
     }
 }
+
+

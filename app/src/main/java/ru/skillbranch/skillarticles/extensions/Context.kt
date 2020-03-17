@@ -1,11 +1,14 @@
 package ru.skillbranch.skillarticles.extensions
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.TypedValue
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 
 fun Context.dpToPx(dp: Int): Float {
@@ -47,4 +50,9 @@ fun Context.attrValue(color: Int): Int {
         ContextCompat.getColor(this, typedValue.resourceId)
     } else
         Color.BLACK
+}
+
+fun Context.hideKeyboard(view: View){
+    val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.hideSoftInputFromWindow(view.windowToken,0)
 }

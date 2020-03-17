@@ -32,7 +32,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-        <ru.skillbranch.skillarticles.markdown.MarkdownContentView
+        <ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownContentView
             android:id="@+id/tv_text_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
