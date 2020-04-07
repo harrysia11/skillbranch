@@ -235,12 +235,12 @@ object MarkdownParser {
                 8 -> {
                     text = string.subSequence(startIndex.inc(), endIndex.dec())
 
-                    val sub =
-                        findElements(
-                            text
-                        )
+//                    val sub =
+//                        findElements(
+//                            text
+//                        )
                     val element =
-                        Element.InlineCode(text, sub)
+                        Element.InlineCode(text)
 
                     parents.add(element)
                     lastStartIndex = endIndex

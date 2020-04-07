@@ -48,6 +48,7 @@ fun Context.attrValue(color: Int): Int {
     val typedValue = TypedValue()
     return if (getTheme().resolveAttribute(color, typedValue, true)) {
         ContextCompat.getColor(this, typedValue.resourceId)
+//        ContextCompat.getColor(this, typedValue.sourceResourceId)
     } else
         Color.BLACK
 }

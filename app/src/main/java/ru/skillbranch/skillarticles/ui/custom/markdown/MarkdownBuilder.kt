@@ -42,10 +42,10 @@ class MarkdownBuilder(
 
 
 
-    fun markdownToSpan(TextContent: MarkdownElement.Text): SpannedString{
+    fun markdownToSpan(textContent: MarkdownElement.Text): SpannedString{
 
         return buildSpannedString {
-            TextContent.elements.forEach{
+            textContent.elements.forEach{
                 buildElement(it, this)
             }
         }

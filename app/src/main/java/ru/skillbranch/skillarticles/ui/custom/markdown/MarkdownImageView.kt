@@ -3,7 +3,10 @@ package ru.skillbranch.skillarticles.ui.custom.markdown
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.text.Spannable
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
@@ -14,8 +17,12 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.attrValue
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
@@ -92,6 +99,7 @@ class MarkdownImageView private constructor(
                 }
             }
             clipToOutline = true
+            background = ColorDrawable(Color.RED)
         }
         addView(iv_image)
 
@@ -121,6 +129,30 @@ class MarkdownImageView private constructor(
 
         Glide.with(context)
             .load(url)
+//            .load("http://ip.cbzt.ru/api/getNamePlate?OrderNumber=7223376")
+ //           .error(R.drawable.logo)
+            .listener(object: RequestListener<Drawable>{
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    Log.e("Glide onLoadFailed()", "url= $url, error= ${e.toString()}")
+                    return false;
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
+            }
+            )
             .transform(AspectRatioResizeTransform())
             .into(iv_image)
 
@@ -274,4 +306,5 @@ class AspectRatioResizeTransform : BitmapTransformation() {
     override fun hashCode(): Int {
         return ID.hashCode()
     }
+
 }
