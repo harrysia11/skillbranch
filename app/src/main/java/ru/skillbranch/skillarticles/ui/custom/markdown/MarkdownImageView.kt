@@ -3,30 +3,27 @@ package ru.skillbranch.skillarticles.ui.custom.markdown
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
+import android.os.Parcel
+import android.os.Parcelable
 import android.text.Spannable
-import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
+import androidx.annotation.VisibleForTesting
 import androidx.core.animation.doOnEnd
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.attrValue
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.dpToPx
+import ru.skillbranch.skillarticles.extensions.setPaddingOptionally
 import java.nio.charset.Charset
 import java.security.MessageDigest
 import kotlin.math.hypot
@@ -52,9 +49,14 @@ class MarkdownImageView private constructor(
     private lateinit var imageUrl: String
     private lateinit var imageTitle: CharSequence
 
-    public val iv_image: ImageView
-    public val tv_title: MarkdownTextView
-    public var tv_alt: TextView? = null
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val iv_image: ImageView
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val tv_title: MarkdownTextView
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    var tv_alt: TextView? = null
 
     @Px
     private val titleTopMargin: Int = context.dpToIntPx(8)//8dp
@@ -78,18 +80,14 @@ class MarkdownImageView private constructor(
         strokeWidth = 0f
     }
 
+    private var isOpen = false
+    private var aspectRatio = 0f
+
     init {
-
-        //setBackgroundColor(Color.RED)
-
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-
         iv_image = ImageView(context).apply {
-
             scaleType = ImageView.ScaleType.CENTER_CROP
-
             setImageResource(R.mipmap.ic_launcher_round)
-
             outlineProvider = object : ViewOutlineProvider(){
                 override fun getOutline(view: View, outline: Outline) {
                     outline.setRoundRect(
@@ -99,7 +97,6 @@ class MarkdownImageView private constructor(
                 }
             }
             clipToOutline = true
-            background = ColorDrawable(Color.RED)
         }
         addView(iv_image)
 
@@ -108,9 +105,7 @@ class MarkdownImageView private constructor(
             setTextColor(colorOnBackground)
             gravity = Gravity.CENTER
             typeface = Typeface.create(Typeface.MONOSPACE,Typeface.NORMAL)
- //           setPaddingOptionally(left = titlePadding, right = titlePadding )
-  //          layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-
+            setPaddingOptionally(left = titlePadding, right = titlePadding )
         }
         addView(tv_title)
     }
@@ -127,34 +122,32 @@ class MarkdownImageView private constructor(
         imageTitle = title
         tv_title.setText(title, TextView.BufferType.SPANNABLE)
 
-        Glide.with(context)
-            .load(url)
-//            .load("http://ip.cbzt.ru/api/getNamePlate?OrderNumber=7223376")
- //           .error(R.drawable.logo)
-            .listener(object: RequestListener<Drawable>{
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    Log.e("Glide onLoadFailed()", "url= $url, error= ${e.toString()}")
-                    return false;
-                }
-
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                }
-            }
-            )
-            .transform(AspectRatioResizeTransform())
-            .into(iv_image)
+//        Glide.with(context)
+//            .load(url)
+//            .listener(object: RequestListener<Drawable>{
+//                override fun onLoadFailed(
+//                    e: GlideException?,
+//                    model: Any?,
+//                    target: Target<Drawable>?,
+//                    isFirstResource: Boolean
+//                ): Boolean {
+//                    Log.e("Glide onLoadFailed()", "url= $url, error= ${e.toString()}")
+//                    return false;
+//                }
+//
+//                override fun onResourceReady(
+//                    resource: Drawable?,
+//                    model: Any?,
+//                    target: Target<Drawable>?,
+//                    dataSource: DataSource?,
+//                    isFirstResource: Boolean
+//                ): Boolean {
+//                    return true
+//                }
+//            }
+//            )
+//            .transform(AspectRatioResizeTransform())
+//            .into(iv_image)
 
         if(alt != null){
             tv_alt = TextView(context).apply {
@@ -173,19 +166,38 @@ class MarkdownImageView private constructor(
                 animateHideAlt()
             }else{
                 animateShowAlt()
+                isOpen = !isOpen
             }
         }
 
+
+
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        Glide.with(context)
+            .load(imageUrl)
+            .transform(AspectRatioResizeTransform())
+            .into(iv_image)
+    }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     override public fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         var usedHeight = 0
         val width = View.getDefaultSize(suggestedMinimumWidth,widthMeasureSpec)
 
         val ms = MeasureSpec.makeMeasureSpec(width,MeasureSpec.EXACTLY)
 
-        iv_image.measure(ms, heightMeasureSpec)
+        if(aspectRatio != 0f) {
+            // restore
+            val hms =
+                MeasureSpec.makeMeasureSpec((width / aspectRatio).toInt(), MeasureSpec.EXACTLY)
+            iv_image.measure(ms, hms)
+        }else{
+            iv_image.measure(ms,heightMeasureSpec)
+        }
+
         tv_title.measure(ms, heightMeasureSpec)
         tv_alt?.measure(ms, heightMeasureSpec)
 
@@ -197,12 +209,13 @@ class MarkdownImageView private constructor(
 
         usedHeight += iv_image.measuredHeight
         usedHeight += titleTopMargin
-        linePositionY = (usedHeight + tv_title.measuredHeight/2f)
+        linePositionY = usedHeight + tv_title.measuredHeight/2f
         usedHeight += tv_title.measuredHeight
 
         setMeasuredDimension(width, usedHeight)
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     override public fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         var used_height = 0
         val bodyWidth = r - l - paddingLeft - paddingRight
@@ -228,10 +241,9 @@ class MarkdownImageView private constructor(
             right,
             iv_image.measuredHeight
         )
-
-
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     override public fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
         canvas.drawLine(
@@ -275,7 +287,51 @@ class MarkdownImageView private constructor(
         va.doOnEnd { tv_alt?.isVisible = false }
         va.start()
     }
+
+
+    override fun onSaveInstanceState(): Parcelable? {
+        val savedState = SavedState(super.onSaveInstanceState())
+        savedState.ssIsOpen = isOpen
+        savedState.ssAspectRatio = (iv_image.width.toFloat()/ iv_image.height.toFloat())
+        return savedState
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        super.onRestoreInstanceState(state)
+        if(state is SavedState)
+        {
+            isOpen = state.ssIsOpen
+            aspectRatio = state.ssAspectRatio
+            tv_alt?.isVisible = isOpen
+        }
+    }
+
+private class SavedState: BaseSavedState, Parcelable{
+    var ssIsOpen: Boolean = false
+    var ssAspectRatio: Float = 0f
+
+    constructor(superState: Parcelable?): super(superState)
+
+    constructor(src: Parcel): super(src){
+        ssIsOpen = src.readInt() == 1
+        ssAspectRatio = src.readFloat()
+    }
+
+    override fun writeToParcel(dst: Parcel, flags: Int) {
+        super.writeToParcel(dst, flags)
+        dst.writeInt(if(ssIsOpen) 1 else 0)
+        dst.writeFloat(ssAspectRatio)
+    }
+
+    override fun describeContents(): Int = 0
+
+    companion object CREATOR : Parcelable.Creator<SavedState>{
+        override fun createFromParcel(source: Parcel): SavedState = SavedState(source)
+
+        override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
+    }
 }
+
 
 class AspectRatioResizeTransform : BitmapTransformation() {
     private val ID =
@@ -307,4 +363,5 @@ class AspectRatioResizeTransform : BitmapTransformation() {
         return ID.hashCode()
     }
 
+    }
 }

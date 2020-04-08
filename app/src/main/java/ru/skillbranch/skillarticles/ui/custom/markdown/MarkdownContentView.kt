@@ -1,10 +1,15 @@
 package ru.skillbranch.skillarticles.ui.custom.markdown
 
 import android.content.Context
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
+import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.util.isEmpty
+import androidx.core.view.ViewCompat
 import androidx.core.view.children
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
@@ -18,6 +23,7 @@ class MarkdownContentView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr) {
     private lateinit var elements: List<MarkdownElement>
+    private var layoutManager: LayoutManager = LayoutManager()
 
     //for restore
     private var ids = arrayListOf<Int>()
@@ -31,7 +37,7 @@ class MarkdownContentView @JvmOverloads constructor(
         }
     }
     var isLoading: Boolean = true
-   // val padding //8dp
+    val padding  = context.dpToIntPx(8)//8dp
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         var usedHeight = paddingTop
@@ -71,13 +77,15 @@ class MarkdownContentView @JvmOverloads constructor(
         }
     }
 
+
     fun setContent(content: List<MarkdownElement>) {
         elements = content
+        var index = 0
         content.forEach {
             when(it){
                 is MarkdownElement.Text -> {
                     val tv = MarkdownTextView(context,textSize).apply{
-                        setPaddingOptionally(left = context.dpToIntPx(8),right = context.dpToIntPx(8))
+                        setPaddingOptionally(left = padding,right = padding)
                         setLineSpacing(fontSize * 0.5f,1f)
                     }
                     MarkdownBuilder(context)
@@ -96,6 +104,8 @@ class MarkdownContentView @JvmOverloads constructor(
                         it.image.alt
                     )
                     addView(iv)
+                    layoutManager.attachToParent(iv,index = index)
+                    index++
                 }
                 is MarkdownElement.Scroll -> {
                         val sv = MarkdownCodeView(
@@ -104,6 +114,8 @@ class MarkdownContentView @JvmOverloads constructor(
                             it.blockCode.text
                         )
                         addView(sv)
+                    layoutManager.attachToParent(sv, index)
+                    index++
                     }
                 }
         }
@@ -156,8 +168,87 @@ class MarkdownContentView @JvmOverloads constructor(
     }
 
     fun setCopyListener(listener: (String) -> Unit) {
-        //TODO implement me
+        children.filterIsInstance<MarkdownCodeView>()
+            .forEach {
+                it.copyListener = listener
+            }
     }
+
+    override fun onSaveInstanceState(): Parcelable? {
+        val state = SavedState(super.onSaveInstanceState())
+        state.layout = layoutManager
+        return state
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        super.onRestoreInstanceState(state)
+        if(state is SavedState) layoutManager = state.layout
+    }
+
+    override fun dispatchRestoreInstanceState(container: SparseArray<Parcelable>?) {
+        children.filter { it is MarkdownTextView }
+            .forEach { it.saveHierarchyState(layoutManager.container) }
+        dispatchFreezeSelfOnly(container)
+    }
+
+
+private class LayoutManager() : Parcelable {
+    var ids: MutableList<Int> = mutableListOf()
+    var container: SparseArray<Parcelable> = SparseArray()
+
+    constructor(parcel: Parcel) : this() {
+        ids = parcel.readArrayList(Int::class.java.classLoader) as ArrayList<Int>
+        container =
+            parcel.readSparseArray<Parcelable>(this::class.java.classLoader) as SparseArray<Parcelable>
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeIntArray(ids.toIntArray())
+        parcel.writeSparseArray(container)
+    }
+
+    fun attachToParent(view: View, index: Int) {
+        if (container.isEmpty()) {
+            view.id = ViewCompat.generateViewId()
+            ids.add(view.id)
+        } else {
+            view.id = ids[index]
+            view.restoreHierarchyState(container)
+        }
+    }
+
+    override fun describeContents(): Int = 0
+
+    companion object CREATOR : Parcelable.Creator<LayoutManager> {
+        override fun createFromParcel(source: Parcel): LayoutManager = LayoutManager(source)
+
+        override fun newArray(size: Int): Array<LayoutManager?> = arrayOfNulls(size)
+    }
+}
+    private class SavedState : BaseSavedState, Parcelable{
+        lateinit var layout: LayoutManager
+
+        constructor(superState: Parcelable?): super(superState)
+
+        constructor(src: Parcel): super(src){
+            layout = src.readParcelable(LayoutManager::class.java.classLoader)!!
+        }
+
+        override fun writeToParcel(out: Parcel, flags: Int) {
+            super.writeToParcel(out, flags)
+            out.writeParcelable(layout,flags)
+        }
+
+        override fun describeContents(): Int = 0
+
+        companion object CREATOR: Parcelable.Creator<SavedState>{
+
+            override fun createFromParcel(source: Parcel): SavedState  = SavedState(source)
+
+            override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
+        }
+    }
+
 }
 
 
