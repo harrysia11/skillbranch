@@ -18,6 +18,10 @@ class RenderProp<T>(
         if(needInit) onChange?.invoke(value)
     }
 
+    fun bind(){
+        if(needInit) onChange?.invoke(value)
+    }
+
     override fun getValue(thisRef: Binding, property: KProperty<*>): T = value
 
     override fun setValue(thisRef: Binding, property: KProperty<*>, value: T) {
@@ -31,6 +35,10 @@ class RenderProp<T>(
     fun addListener( listener: () -> Unit){
         Log.e("RenderProp addListener","${listener.toString()}")
         listeners.add(listener)
+    }
+
+    private fun registerDelegate(thisRef: Binding, name: String, delegate: RenderProp<Any>){
+        thisRef.delegates[name] = delegate
     }
 }
 
