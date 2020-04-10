@@ -1,9 +1,8 @@
 package ru.skillbranch.skillarticles.viewmodels
 
-import android.os.Bundle
 import android.util.Log
-import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import ru.skillbranch.skillarticles.data.ArticleData
 import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
@@ -18,8 +17,12 @@ import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
 class ArticleViewModel(
+    handle: SavedStateHandle,
     private val articleId: String
-    ) :   BaseViewModel<ArticleState>(ArticleState()) , IArticleViewModel{
+) : BaseViewModel<ArticleState>(
+        handle,
+        ArticleState()
+), IArticleViewModel {
 
     private val repository = ArticleRepository
     private val TAG : String = "ArticleViewModel"
@@ -62,6 +65,11 @@ class ArticleViewModel(
                 isDarkMode = settings.isDarkMode,
                 isBigText = settings.isBigText
             )
+        }
+
+        subscribeOnDataSource(repository.isAuth()){
+            auth, state ->
+            state.copy(isAuth = auth)
         }
     }
 
@@ -171,6 +179,10 @@ class ArticleViewModel(
         notify(Notify.TextMessage("Code copy to clipboard"))
     }
 
+    fun handleSendComment(){
+        if(!currentState.isAuth) navigate(NavigationCommand.StartLogin())
+    }
+
 }
 
 
@@ -196,24 +208,21 @@ data class ArticleState(
     val poster: String? = null,
     val content: List<MarkdownElement> = emptyList(),
     val reviews: List<Any> = emptyList()
-): IViewModelState{
-    override fun save(outState: Bundle) {
-        outState.putAll(
-            bundleOf(
-               "isSearch" to isSearch,
-                "searchQuery" to searchQuery,
-                "searchResults" to searchResults,
-                "searchPosition" to searchPosition
-            )
-        )
+) : IViewModelState {
+
+    override fun save(outState: SavedStateHandle) {
+        outState.set("isSearch", isSearch)
+        outState.set("searchQuery", searchQuery)
+        outState.set("searchResults", searchResults)
+        outState.set("searchPosition", searchPosition)
     }
 
-    override fun restore(saveState: Bundle): ArticleState {
+    override fun restore(saveState: SavedStateHandle): ArticleState {
         return copy(
-            isSearch = saveState["isSearch"] as Boolean,
-            searchQuery = saveState["searchQuery"] as String?,
-            searchResults = saveState["searchResults"] as List<Pair<Int,Int>>,
-            searchPosition = saveState["searchPosition"] as Int
+            isSearch = saveState["isSearch"] ?: false,
+            searchQuery = saveState["searchQuery"],
+            searchResults = saveState["searchResults"] ?: emptyList(),
+            searchPosition = saveState["searchPosition"] ?: 0
         )
 
     }
