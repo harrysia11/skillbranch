@@ -4,7 +4,7 @@ import ru.skillbranch.skillarticles.data.AppSettings
 import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
 
 
-import ru.skillbranch.skillarticles.viewmodels.ArticleState
+import ru.skillbranch.skillarticles.viewmodels.articles.ArticleState
 
 fun ArticleState.toAppSettings() : AppSettings {
     return AppSettings(isDarkMode,isBigText)

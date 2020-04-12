@@ -104,10 +104,7 @@ abstract class BaseViewModel<T: IViewModelState>(
     fun restoreState(){
         state.value = currentState.restore(handleState) as T
     }
-
 }
-
-
 
 class Event<out E>(private val content: E) {
     var hasBeenHandled = false
