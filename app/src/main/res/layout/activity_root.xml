@@ -26,23 +26,15 @@
            android:elevation="4dp"/>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/scroll"
+    <fragment
+        android:id="@+id/nav_host_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        app:defaultNavHost = "true"
+        app:navGrath = "">
 
-        <ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownContentView
-            android:id="@+id/tv_text_content"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:focusable="true"
-            android:clipToPadding="false"
-            android:focusableInTouchMode="true"/>
-        <!--   android:saveEnabled="false" -->
-
-    </androidx.core.widget.NestedScrollView>
+    </fragment>
     
     <ru.skillbranch.skillarticles.ui.custom.ArticleSubmenu
         android:id="@+id/submenu"

@@ -5,7 +5,7 @@ import ru.skillbranch.skillarticles.ui.base.Binding
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class RenderProp<T>(
+class RenderProp<T: Any>(
     var value: T,
     val needInit: Boolean = true,
     private val onChange: ((T) -> Unit)? = null
