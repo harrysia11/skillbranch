@@ -16,8 +16,11 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions.circleCropTransform
 import com.google.android.material.appbar.AppBarLayout
-import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.fragment_article.*
+import kotlinx.android.synthetic.main.fragment_article.iv_poster
+import kotlinx.android.synthetic.main.fragment_article.tv_author
+import kotlinx.android.synthetic.main.fragment_article.tv_title
+import kotlinx.android.synthetic.main.item_article.*
 import kotlinx.android.synthetic.main.layout_bottombar.*
 import kotlinx.android.synthetic.main.layout_bottombar.view.*
 import kotlinx.android.synthetic.main.layout_submenu.*
@@ -26,6 +29,7 @@ import kotlinx.android.synthetic.main.search_view_layout.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
+import ru.skillbranch.skillarticles.extensions.format
 import ru.skillbranch.skillarticles.extensions.hideKeyboard
 import ru.skillbranch.skillarticles.extensions.setMarginOptionally
 import ru.skillbranch.skillarticles.ui.base.*
@@ -41,7 +45,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
     override val viewModel: ArticleViewModel by viewModels{
         ViewModelFactory(
             owner = this,
-            params = "0"
+            params = args.articleId
         )
     }
     override val layout: Int= R.layout.fragment_article
@@ -78,6 +82,9 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         setupBottomBar()
         setupSubmenu()
 
+        val avatarSize = root.dpToIntPx(40)
+        val cornerRadius = root.dpToIntPx(8)
+
         Glide.with(root)
             .load(args.authorAvatar)
             .apply(circleCropTransform())
@@ -91,7 +98,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
 
         tv_title.text = args.title
         tv_author.text = args.author
-        tv_date.text = args.date.format()
+        tv_date.text = args.data.format()
 
         et_comment.setOnEditorActionListener{ view, _, _ ->
             root.hideKeyboard(view)
@@ -130,8 +137,8 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             menuItem.expandActionView()
             searchView.setQuery(binding.searchQuery, false)
 
-            if(binding.isFocusedSearch) searchView?.requestFocus()
-            else searchView?.clearFocus()
+            if(binding.isFocusedSearch) searchView.requestFocus()
+            else searchView.clearFocus()
         }
 
         menuItem.setOnActionExpandListener(object: MenuItem.OnActionExpandListener{
@@ -205,40 +212,40 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         private var isLoadingContent by RenderProp(true)
 
         private var isLike: Boolean by RenderProp(false) {
-            btn_like.isChecked = it
+            bottombar.btn_like.isChecked = it
         }
         private var isBookmark: Boolean by RenderProp(
             false
-        ) { btn_bookmark.isChecked = it }
+        ) { bottombar.btn_bookmark.isChecked = it }
 
         private var isShowMenu: Boolean by RenderProp(
             false
         ) {
-            btn_settings.isChecked = it
+            bottombar.btn_settings.isChecked = it
             if (it) submenu.open() else submenu.close()
         }
 
-        private var title: String by RenderProp("loading") {
-            toolbar.title = it
-        }
-        private var category: String by RenderProp("loading") {
-            toolbar.subtitle = it
-        }
-        private var categoryIcon: Int by RenderProp(R.drawable.logo_placeholder) {
-            toolbar.logo = getDrawable(it)
-        }
+//        private var title: String by RenderProp("loading") {
+//            toolbar.title = it
+//        }
+//        private var category: String by RenderProp("loading") {
+//            toolbar.subtitle = it
+//        }
+//        private var categoryIcon: Int by RenderProp(R.drawable.logo_placeholder) {
+//            toolbar.logo = getDrawable(it)
+//        }
 
         private var isBigText: Boolean by RenderProp(
             false
         ) {
             if (it) {
                 tv_text_content.textSize = 18f
-                btn_text_up.isChecked = true
-                btn_text_down.isChecked = false
+                submenu.btn_text_up.isChecked = true
+                submenu.btn_text_down.isChecked = false
             } else {
                 tv_text_content.textSize = 14f
-                btn_text_up.isChecked = false
-                btn_text_down.isChecked = true
+                submenu.btn_text_up.isChecked = false
+                submenu.btn_text_down.isChecked = true
             }
         }
 
@@ -246,7 +253,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             false,
             false
         ) {
-            switch_mode.isChecked = it
+            submenu.switch_mode.isChecked = it
             root.delegate.localNightMode =
                 if (it) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
         }
@@ -310,9 +317,9 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             isLike = data.isLike
             isBookmark = data.isBookmark
             isShowMenu = data.isShowMenu
-            if(data.title != null) title = data.title
-            if(data.category != null) category = data.category
-            if(data.categoryIcon != null) categoryIcon = data.categoryIcon as Int
+//            if(data.title != null) title = data.title
+//            if(data.category != null) category = data.category
+//            if(data.categoryIcon != null) categoryIcon = data.categoryIcon as Int
             isBigText = data.isBigText
             isDarkMode = data.isDarkMode
 

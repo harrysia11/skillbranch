@@ -10,12 +10,16 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.item_article.*
 import ru.skillbranch.skillarticles.R
+import ru.skillbranch.skillarticles.data.ArticleItemData
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
+import ru.skillbranch.skillarticles.extensions.format
 
 class ArticlesAdapter(
     private val listener: (ArticleItemData) -> Unit
 ):ListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallBack()) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
         val containerView = LayoutInflater.from(parent.context).inflate(R.layout.item_article, parent, false)
         return ArticleVH(containerView)
@@ -51,7 +55,7 @@ class ArticleVH(
             .into(iv_poster)
 
         Glide.with(containerView.context)
-            .load(item.categoryItem)
+            .load(item.categoryIcon)
             .transform(CenterCrop(),RoundedCorners(cornerRadius))
             .override(categorySize)
             .into(iv_category)
@@ -60,7 +64,7 @@ class ArticleVH(
         tv_author.text = item.author
         tv_title.text = item.title
         tv_description.text = item.description
-        tv_lakes_count.text = "${item.likeCount}"
+        tv_likes_count.text = "${item.likeCount}"
         tv_comments_count.text = "${item.commentCount}"
         tv_read_duration.text = "${item.readDuration} min read"
 

@@ -8,15 +8,16 @@ import android.widget.ImageView
 import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat.getDrawable
 import androidx.core.os.bundleOf
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions.circleCropTransform
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
-import com.google.android.material.resources.MaterialResources.getDrawable
 import kotlinx.android.synthetic.main.activity_root.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
@@ -27,7 +28,6 @@ import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
 abstract class BaseActivity<T: BaseViewModel<out IViewModelState>> : AppCompatActivity() {
 
-    protected abstract val binding: Binding
     protected abstract val viewModel: T
     protected abstract val layout: Int
     lateinit var navController: NavController
@@ -45,7 +45,7 @@ abstract class BaseActivity<T: BaseViewModel<out IViewModelState>> : AppCompatAc
         super.onCreate(savedInstanceState)
         setContentView(layout)
         setSupportActionBar(toolbar)
-        viewModel.observeState(this) { binding.bind(it) }
+        viewModel.observeState(this) { subscribeOnState(it) }
         viewModel.observeNotifications(this) { renderNotification(it) }
         viewModel.observeNavigation(this) { subscribeOnNavigation(it) }
 
@@ -93,6 +93,7 @@ abstract class BaseActivity<T: BaseViewModel<out IViewModelState>> : AppCompatAc
 }
 
 class ToolbarBuilder(){
+
     var title: String? = null
     var subtitle: String? = null
     var logo: String? = null
@@ -131,6 +132,7 @@ class ToolbarBuilder(){
         return this
     }
     fun prepare(prepareFn: (ToolbarBuilder.() -> Unit)?): ToolbarBuilder{
+        invalidate()
         prepareFn?.invoke(this)
         return this
     }

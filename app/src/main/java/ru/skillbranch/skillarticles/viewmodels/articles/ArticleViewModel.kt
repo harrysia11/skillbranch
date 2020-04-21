@@ -182,6 +182,7 @@ class ArticleViewModel(
 
     fun handleSendComment(){
         if(!currentState.isAuth) navigate(NavigationCommand.StartLogin())
+        // TODO send comment
     }
 
 }

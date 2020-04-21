@@ -19,7 +19,7 @@ abstract class BaseFragment<T: BaseViewModel<out IViewModelState>> : Fragment(){
     open val prepareBottombar: (BottombarBuilder.() -> Unit)? = null
 
     val toolbar
-    get() = root.toolbar
+        get() = root.toolbar
 
     abstract fun setupViews()
 

@@ -1,13 +1,14 @@
 package ru.skillbranch.skillarticles.ui.auth
 
 import android.text.Spannable
-import android.text.style.UnderlineSpan
 import androidx.core.text.set
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import kotlinx.android.synthetic.main.fragment_auth.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.attrValue
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
+import ru.skillbranch.skillarticles.ui.custom.spans.UnderlineSpan
 import ru.skillbranch.skillarticles.viewmodels.auth.AuthViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
 
@@ -28,7 +29,7 @@ class AuthFragment: BaseFragment<AuthViewModel>() {
             )
         }
         val color = root.attrValue(R.attr.colorPrimary)
-        (tv_access_code.text as Spannable).let{ it[0..it.length] = UnderlineSpan(color)}
+        (tv_access_code.text as Spannable).let{ it[0..it.length] = UnderlineSpan(color) }
         (tv_privacy.text as Spannable).let{ it[0..it.length] = UnderlineSpan(color)}
 
     }
