@@ -8,7 +8,7 @@
         android:title="@string/title_bookmarks"/>
     <item android:id="@+id/nav_transcription"
         android:icon="@drawable/ic_translate_black_24dp"
-        android:title="@string/title_translations"/>
+        android:title="@string/title_transcriptions"/>
     <item android:id="@+id/nav_profile"
         android:icon="@drawable/ic_account_circle_black_24dp"
         android:title="@string/title_profile"/>

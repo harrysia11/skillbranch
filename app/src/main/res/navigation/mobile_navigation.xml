@@ -11,7 +11,8 @@
         android:label="@string/title_articles" >
         <argument
             android:name="article_id"
-            app:argType="string" />
+            app:argType="string"
+            android:defaultValue="-1" />
         <argument
             android:name="author"
             app:argType="string" />
@@ -25,14 +26,14 @@
             android:name="category_icon"
             app:argType="string" />
         <argument
-            android:name="data"
-            app:argType="java.util.Date" />
-        <argument
             android:name="poster"
             app:argType="string" />
         <argument
             android:name="title"
             app:argType="string" />
+        <argument
+            android:name="date"
+            app:argType="java.util.Date" />
     </fragment>
     <fragment
         android:id="@+id/nav_articles"
@@ -55,20 +56,17 @@
     <fragment
         android:id="@+id/nav_transcription"
         android:name="ru.skillbranch.skillarticles.ui.transcriptions.TranscriptionsFragment"
-        android:label="@string/title_translations"
+        android:label="@string/title_transcriptions"
         tools:layout="@layout/fragment_transcriptions" />
     <navigation
-        android:id="@+id/navigation"
-        app:startDestination="@id/auth"
+        android:id="@+id/auth"
+        app:startDestination="@id/nav_auth"
         android:label="@string/title_authorization">
         <fragment
-            android:id="@+id/auth"
+            android:id="@+id/nav_auth"
             android:name="ru.skillbranch.skillarticles.ui.auth.AuthFragment"
             android:label="@string/title_authorization"
             tools:layout="@layout/fragment_auth">
-            <action
-                android:id="@+id/action_authFragment_to_privacyPolicyFragment"
-                app:destination="@id/page_privacy_policy" />
             <argument
                 android:name="private_destination"
                 app:argType="integer"
