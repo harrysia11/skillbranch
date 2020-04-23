@@ -60,7 +60,7 @@ class ArticleVH(
             .override(categorySize)
             .into(iv_category)
 
-        tv_date.text = item.date.format()
+        tv_date_item.text = item.date.format()
         tv_author.text = item.author
         tv_title.text = item.title
         tv_description.text = item.description

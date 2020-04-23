@@ -25,6 +25,7 @@ import kotlinx.android.synthetic.main.search_view_layout.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
+import ru.skillbranch.skillarticles.extensions.format
 import ru.skillbranch.skillarticles.extensions.hideKeyboard
 import ru.skillbranch.skillarticles.extensions.setMarginOptionally
 import ru.skillbranch.skillarticles.ui.base.*
@@ -93,7 +94,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
 
         tv_title.text = args.title
         tv_author.text = args.author
- //       tv_date.text = args.date.format()
+        tv_date.text = args.date?.format()
 
         et_comment.setOnEditorActionListener{ view, _, _ ->
             root.hideKeyboard(view)
