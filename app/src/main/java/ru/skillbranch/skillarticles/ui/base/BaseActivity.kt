@@ -215,6 +215,7 @@ class BottombarBuilder(){
         if(views.isNotEmpty()){
             val inflator = LayoutInflater.from(context)
             views.forEach {
+                // container - это android.id="@+id/container" - из разметки activity_root
                 val view = inflator.inflate(it, context.container, false)
                 context.container.addView(view)
                 tempViews.add(view.id)
