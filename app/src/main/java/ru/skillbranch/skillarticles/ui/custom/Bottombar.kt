@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.ui.custom
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
@@ -101,6 +102,16 @@ class Bottombar @JvmOverloads constructor(
             0 -> btn_result_up.isEnabled = false
             searchCount -1 -> btn_result_down.isEnabled = false
         }
+    }
+
+    fun hide() {
+        ObjectAnimator.ofFloat(this,"translationY", 0f)
+            .start()
+    }
+
+    fun show(){
+        ObjectAnimator.ofFloat(this,"translationY", height.toFloat())
+            .start()
     }
 
     private class SavedState : BaseSavedState, Parcelable {
