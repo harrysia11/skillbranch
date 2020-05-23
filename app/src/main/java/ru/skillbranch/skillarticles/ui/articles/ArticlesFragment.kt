@@ -32,7 +32,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
                 "Search",
                 R.id.action_search,
                 R.drawable.ic_search_black_24dp,
-                R.id.search_view
+                R.layout.search_view_layout
             )
         )
     }
@@ -64,6 +64,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         val menuItem = menu.findItem(R.id.action_search)
+        if(menuItem == null ) return
         val searchView = menuItem.actionView as SearchView
         if(binding.isSearch){
             menuItem.expandActionView()

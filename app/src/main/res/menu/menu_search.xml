@@ -6,8 +6,8 @@
         android:icon="@drawable/ic_search_black_24dp"
         android:title="Поиск"
         android:actionLayout="@layout/search_view_layout"
-    app:actionViewClass="android.widget.SearchView"
-    app:showAsAction="always|collapseActionView"/>
+        app:showAsAction="always|collapseActionView"/>
+ <!--   app:actionViewClass="android.widget.SearchView" -->
 
 
 </menu>

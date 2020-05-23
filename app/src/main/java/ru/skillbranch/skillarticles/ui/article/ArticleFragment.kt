@@ -39,6 +39,7 @@ import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
     private val TAG: String = "ArticleFragment"
     private val args: ArticleFragmentArgs by navArgs()
+
     override val viewModel: ArticleViewModel by viewModels{
         ViewModelFactory(
             owner = this,
@@ -138,7 +139,8 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(false)
+ //       setHasOptionsMenu(false)
+        setHasOptionsMenu(true)
     }
 
     override fun onDestroyView() {

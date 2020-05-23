@@ -1,13 +1,11 @@
 package ru.skillbranch.skillarticles.ui.articles
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
-import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.models.ArticleItemData
 import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 
@@ -16,8 +14,9 @@ class ArticlesAdapter(
 ):PagedListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
-        val containerView = LayoutInflater.from(parent.context).inflate(R.layout.item_article, parent, false)
-        return ArticleVH(containerView)
+    //    val containerView = LayoutInflater.from(parent.context).inflate(R.layout.item_article, parent, false)
+    //    return ArticleVH(containerView)
+        return ArticleVH(ArticleItemView(parent.context))
     }
 
     override fun onBindViewHolder(holder: ArticleVH, position: Int) {
