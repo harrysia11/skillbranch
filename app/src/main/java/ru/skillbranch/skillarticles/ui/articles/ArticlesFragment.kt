@@ -37,24 +37,30 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         )
     }
 
-    private val articlesAdapter = ArticlesAdapter{
-        item ->
-        Log.e("ArticlesFragment", "click on article: ${item.id}")
-        val direction = ArticlesFragmentDirections.actionNavArticlesToPageArticle(
-            item.id,
-            item.author,
-            item.authorAvatar,
-            item.category,
-            item.categoryIcon,
-            item.title,
-            item.date,
-            item.poster
-        )
- //       findNavController().navigate(direction)
-        viewModel.navigate(
-            NavigationCommand.To(direction.actionId, direction.arguments)
-        )
+    private fun toggleIsBookmark(articlesId: String, isBookmark:Boolean){
+        viewModel.handleToggleBookmark(articlesId,isBookmark)
     }
+
+    private val articlesAdapter:ArticlesAdapter = ArticlesAdapter(
+        {item -> Log.e("ArticlesFragment", "click on article: ${item.id}")
+
+            val direction = ArticlesFragmentDirections.actionNavArticlesToPageArticle(
+                item.id,
+                item.author,
+                item.authorAvatar,
+                item.category,
+                item.categoryIcon,
+                item.title,
+                item.date,
+                item.poster
+            )
+            //       findNavController().navigate(direction)
+            viewModel.navigate(
+                NavigationCommand.To(direction.actionId, direction.arguments)
+            )
+        },
+    ::toggleIsBookmark)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

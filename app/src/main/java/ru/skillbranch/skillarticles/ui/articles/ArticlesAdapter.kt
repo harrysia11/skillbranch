@@ -10,7 +10,9 @@ import ru.skillbranch.skillarticles.data.models.ArticleItemData
 import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 
 class ArticlesAdapter(
-    private val listener: (ArticleItemData) -> Unit
+    private val listener: (ArticleItemData) -> Unit,
+    private val toggleBookmarkListener: (articleId: String, isBookmark: Boolean) -> Unit
+
 ):PagedListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
@@ -20,7 +22,7 @@ class ArticlesAdapter(
     }
 
     override fun onBindViewHolder(holder: ArticleVH, position: Int) {
-        holder.bind(getItem(position), listener)
+        holder.bind(getItem(position), listener, toggleBookmarkListener)
     }
 }
 class ArticleDiffCallBack: DiffUtil.ItemCallback<ArticleItemData>(){
@@ -36,10 +38,10 @@ class ArticleVH(
 
     fun bind(
        item: ArticleItemData?,
-        listener: (ArticleItemData) -> Unit
+       listener: (ArticleItemData) -> Unit,
+       toggleBookmarkListener: (articleId: String, checked: Boolean) -> Unit
     ){
-
-        (containerView as ArticleItemView).bind(item!!,null)
+        (containerView as ArticleItemView).bind(item!!,toggleBookmarkListener) //  null
         itemView.setOnClickListener { listener(item!!) }
 
 //        val posterSize = containerView.context.dpToIntPx(64)

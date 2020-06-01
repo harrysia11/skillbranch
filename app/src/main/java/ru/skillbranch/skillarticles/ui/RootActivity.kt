@@ -44,7 +44,7 @@ class RootActivity : BaseActivity<RootViewModel>() {
             controller, destination, arguments ->
             nav_view.selectDestination(destination)
 
-     //       if(destination.id == R.id.nav_auth) nav_view.selectItem(arguments?.get("private_destination") as Int?)
+//            if(destination.id == R.id.nav_auth) nav_view.selectItem(arguments?.get("private_destination") as Int?)
 
         }
 

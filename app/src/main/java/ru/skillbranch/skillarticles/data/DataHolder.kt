@@ -19,6 +19,8 @@ object LocalDataHolder {
     val localArticleItems: MutableList<ArticleItemData> = mutableListOf()
     val localArticles: MutableMap<String, MutableLiveData<ArticleData>> = mutableMapOf()
 
+    val localBookmarks: MutableList<ArticleItemData> = mutableListOf()
+
     fun findArticle(articleId: String): LiveData<ArticleData?> {
         if (localArticles[articleId] == null) {
             Log.e("DataHolder", "findArticle $articleId: ");
@@ -34,6 +36,13 @@ object LocalDataHolder {
             articleInfo.postValue(ArticlePersonalInfo(isBookmark = true))
         }
         return articleInfo
+    }
+
+    fun findBookmarks() : List<ArticleItemData>{
+        GlobalScope.launch {
+            delay(500)
+        }
+        return  localArticleItems.filter { it.isBookmark }
     }
 
     fun getAppSettings() = settings

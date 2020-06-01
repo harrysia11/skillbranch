@@ -104,6 +104,10 @@ class ArticlesViewModel(handle: SavedStateHandle): BaseViewModel<ArticlesState>(
         updateState { it.copy(searchQuery = query) }
     }
 
+    fun handleToggleBookmark(id:String, isChecked: Boolean){
+        repository.updateBookmark(id,isChecked)
+    }
+
 }
 data class ArticlesState(
     val isSearch: Boolean = false,

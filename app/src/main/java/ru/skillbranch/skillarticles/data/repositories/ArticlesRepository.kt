@@ -40,6 +40,23 @@ object ArticlesRepository {
     fun insertArticlesToDb(articles: List<ArticleItemData>) {
         local.localArticleItems.addAll(articles).apply { sleep(100) }
     }
+
+    fun updateBookmark(id: String, checked: Boolean) {
+        var article = local.localArticleItems.find { it.id == id }
+        val articleId = local.localArticleItems.indexOf(article)
+        article = article?.copy( isBookmark = checked)
+        article ?: return
+        local.localArticleItems[articleId] = article
+    }
+
+    fun loadBookmarks(): ArticlesDataFactory = ArticlesDataFactory(ArticleStrategy.BookmarksArticles(::loadBookmarks))
+
+    fun loadBookmarks(start: Int, size: Int): List<ArticleItemData>{
+        return local.localArticleItems.filter{it.isBookmark}
+            .drop(start)
+            .take(size)
+            .apply{sleep(300)}
+    }
 }
 
 class ArticlesDataFactory( val strategy: ArticleStrategy): DataSource.Factory<Int,ArticleItemData>(){
@@ -86,4 +103,15 @@ sealed class ArticleStrategy(){
         }
     }
     //TODO bookmarks Strategy
+    class BookmarksArticles(private val itemProvider: (Int, Int) -> List<ArticleItemData>): ArticleStrategy(){
+        override fun getItems(start: Int, size: Int): List<ArticleItemData> {
+            return itemProvider(start, size)
+        }
+
+    }
+    class SearchBookmarks(private val itemProvider: (Int, Int, String) -> List<ArticleItemData>, private val query: String): ArticleStrategy(){
+        override fun getItems(start: Int, size: Int): List<ArticleItemData> {
+            return itemProvider(start, size,query)
+        }
+    }
 }
