@@ -14,27 +14,29 @@ object ArticlesRepository {
     private val local = LocalDataHolder
     private val network = NetworkDataHolder
 
-    fun allArticles(): ArticlesDataFactory = ArticlesDataFactory(ArticleStrategy.AllArticles(::findArticlesByRange))
+    fun allArticles(): ArticlesDataFactory =
+        ArticlesDataFactory(ArticleStrategy.AllArticles(::findArticlesByRange))
 
-    fun searchArticles(searchQuery: String): ArticlesDataFactory
-            = ArticlesDataFactory(ArticleStrategy.SearchArticle(::findArticlesByTitle,searchQuery))
+    fun searchArticles(searchQuery: String): ArticlesDataFactory =
+        ArticlesDataFactory(ArticleStrategy.SearchArticle(::findArticlesByTitle, searchQuery))
 
     private fun findArticlesByRange(start: Int, size: Int) = local.localArticleItems
         .drop(start)
         .take(size)
 
-    private fun findArticlesByTitle(start: Int, size: Int, searchQuery: String) = local.localArticleItems
-        .asSequence()
-        .filter { it.title.contains(searchQuery,true) }
-        .drop(start)
-        .take(size)
-        .toList()
+    private fun findArticlesByTitle(start: Int, size: Int, searchQuery: String) =
+        local.localArticleItems
+            .asSequence()
+            .filter { it.title.contains(searchQuery, true) }
+            .drop(start)
+            .take(size)
+            .toList()
 
-    fun loadArticlesFromNetwork(start:Int, size: Int): List<ArticleItemData> {
+    fun loadArticlesFromNetwork(start: Int, size: Int): List<ArticleItemData> {
         return network.networkArticleItems
             .drop(start)
             .take(size)
-            .apply{ sleep(500)}
+            .apply { sleep(500) }
     }
 
     fun insertArticlesToDb(articles: List<ArticleItemData>) {
@@ -44,19 +46,36 @@ object ArticlesRepository {
     fun updateBookmark(id: String, checked: Boolean) {
         var article = local.localArticleItems.find { it.id == id }
         val articleId = local.localArticleItems.indexOf(article)
-        article = article?.copy( isBookmark = checked)
+        article = article?.copy(isBookmark = checked)
         article ?: return
         local.localArticleItems[articleId] = article
     }
 
-    fun loadBookmarks(): ArticlesDataFactory = ArticlesDataFactory(ArticleStrategy.BookmarksArticles(::loadBookmarks))
+    fun loadBookmarks(): ArticlesDataFactory =
+        ArticlesDataFactory(ArticleStrategy.BookmarksArticles(::loadBookmarks))
 
-    fun loadBookmarks(start: Int, size: Int): List<ArticleItemData>{
-        return local.localArticleItems.filter{it.isBookmark}
+    fun loadBookmarks(start: Int, size: Int): List<ArticleItemData> {
+        return local.localArticleItems.filter { it.isBookmark }
             .drop(start)
             .take(size)
-            .apply{sleep(300)}
+            .apply { sleep(300) }
     }
+
+    fun loadBookmarks(start: Int, size: Int, queryString: String): List<ArticleItemData> {
+        return local.localArticleItems.filter {
+            it.isBookmark && it.title.contains(
+                queryString,
+                true
+            )
+        }
+            .drop(start)
+            .take(size)
+            .apply { sleep(300) }
+    }
+
+    fun searchBookmarks(queryString: String): ArticlesDataFactory =
+        ArticlesDataFactory(ArticleStrategy.SearchBookmarks(::loadBookmarks, queryString))
+
 }
 
 class ArticlesDataFactory( val strategy: ArticleStrategy): DataSource.Factory<Int,ArticleItemData>(){

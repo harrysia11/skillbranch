@@ -1,6 +1,7 @@
 package ru.skillbranch.skillarticles.viewmodels.bookmarks
 
 import android.util.Log
+import androidx.annotation.UiThread
 import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
@@ -13,9 +14,17 @@ import ru.skillbranch.skillarticles.data.repositories.ArticlesRepository
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesBoundaryCallback
 import java.util.concurrent.Executors
 
-class BookmarksViewModel: ViewModel() {
+class BookmarksViewModel(initState: BookmarksState = BookmarksState()): ViewModel() {
 
     private val repository = ArticlesRepository
+
+    //@VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    val state: MediatorLiveData<BookmarksState> = MediatorLiveData<BookmarksState>().apply {
+        value = initState
+    }
+
+    val currentState
+        get() = state.value!!
 
     private val listConfig by lazy{
         PagedList.Config.Builder()
@@ -26,7 +35,12 @@ class BookmarksViewModel: ViewModel() {
             .build()
     }
 
-    private val listData = buildPageList(repository.loadBookmarks())
+    private val listData = Transformations.switchMap(state) {
+        when {
+            it.isSearch && !it.queryString.isNullOrBlank() -> buildPageList(repository.searchBookmarks(currentState.queryString!!))
+            else -> buildPageList(repository.loadBookmarks())
+        }
+    }
 
     private fun buildPageList(
         dataFactory: ArticlesDataFactory
@@ -76,5 +90,29 @@ class BookmarksViewModel: ViewModel() {
         )
     }
 
+    fun handleToggleBookmark(articlesId: String, bookmark: Boolean) {
+        repository.updateBookmark(articlesId,bookmark)
+        listData.value?.dataSource?.invalidate()
+    }
 
+    fun handleSearchMode(isSearch: Boolean) {
+        updateState{it.copy(isSearch = isSearch)}
+    }
+
+    fun handleSearch(newQuery: String?) {
+        newQuery ?: return
+        updateState{it.copy(queryString = newQuery)}
+
+    }
+
+    @UiThread
+    protected inline fun updateState(update: (currentState: BookmarksState) -> BookmarksState) {
+        val updatedState: BookmarksState = update(currentState)
+        state.value = updatedState
+    }
+
+    data class BookmarksState(
+        var isSearch: Boolean = false,
+        var queryString: String? = null
+    )
 }
