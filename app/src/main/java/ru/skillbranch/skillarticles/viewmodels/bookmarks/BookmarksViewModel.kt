@@ -1,7 +1,6 @@
 package ru.skillbranch.skillarticles.viewmodels.bookmarks
 
 import android.util.Log
-import androidx.annotation.UiThread
 import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
@@ -12,19 +11,14 @@ import ru.skillbranch.skillarticles.data.repositories.ArticleStrategy
 import ru.skillbranch.skillarticles.data.repositories.ArticlesDataFactory
 import ru.skillbranch.skillarticles.data.repositories.ArticlesRepository
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesBoundaryCallback
+import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
+import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import java.util.concurrent.Executors
 
-class BookmarksViewModel(initState: BookmarksState = BookmarksState()): ViewModel() {
+class BookmarksViewModel(handler:SavedStateHandle ): BaseViewModel<BookmarksState>(handler, BookmarksState()),
+    IViewModelState {
 
     private val repository = ArticlesRepository
-
-    //@VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    val state: MediatorLiveData<BookmarksState> = MediatorLiveData<BookmarksState>().apply {
-        value = initState
-    }
-
-    val currentState
-        get() = state.value!!
 
     private val listConfig by lazy{
         PagedList.Config.Builder()
@@ -105,14 +99,8 @@ class BookmarksViewModel(initState: BookmarksState = BookmarksState()): ViewMode
 
     }
 
-    @UiThread
-    protected inline fun updateState(update: (currentState: BookmarksState) -> BookmarksState) {
-        val updatedState: BookmarksState = update(currentState)
-        state.value = updatedState
-    }
-
-    data class BookmarksState(
-        var isSearch: Boolean = false,
-        var queryString: String? = null
-    )
 }
+data class BookmarksState(
+    var isSearch: Boolean = false,
+    var queryString: String? = null
+): IViewModelState
