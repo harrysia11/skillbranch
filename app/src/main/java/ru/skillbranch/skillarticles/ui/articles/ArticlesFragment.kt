@@ -6,8 +6,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.SearchView
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_articles.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
@@ -69,8 +67,8 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        val menuItem = menu.findItem(R.id.action_search)
-        if(menuItem == null ) return
+        val menuItem = menu.findItem(R.id.action_search) ?: return
+
         val searchView = menuItem.actionView as SearchView
         if(binding.isSearch){
             menuItem.expandActionView()

@@ -7,7 +7,7 @@
         android:title="Поиск"
         android:actionLayout="@layout/search_view_layout"
         app:showAsAction="always|collapseActionView"/>
- <!--   app:actionViewClass="android.widget.SearchView" -->
 
+<!--    app:actionViewClass="androidx.appcompat.widget.SearchView" -->
 
 </menu>
