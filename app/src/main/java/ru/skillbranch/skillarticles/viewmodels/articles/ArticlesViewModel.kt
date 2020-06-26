@@ -7,7 +7,7 @@ import androidx.paging.PagedList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.skillbranch.skillarticles.data.models.ArticleItemData
+import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
 import ru.skillbranch.skillarticles.data.repositories.ArticleStrategy
 import ru.skillbranch.skillarticles.data.repositories.ArticlesDataFactory
 import ru.skillbranch.skillarticles.data.repositories.ArticlesRepository
@@ -40,7 +40,7 @@ class ArticlesViewModel(handle: SavedStateHandle): BaseViewModel<ArticlesState>(
 
     fun observeList(
         owner: LifecycleOwner,
-        onChange: (list: PagedList<ArticleItemData>) -> Unit
+        onChange: (list: PagedList<ArticleItem>) -> Unit
     ){
         listData.observe(owner,
             Observer{onChange(it)}
@@ -49,8 +49,8 @@ class ArticlesViewModel(handle: SavedStateHandle): BaseViewModel<ArticlesState>(
 
     private fun buildPageList(
         dataFactory: ArticlesDataFactory
-    ): LiveData<PagedList<ArticleItemData>> {
-        val builder = LivePagedListBuilder<Int, ArticleItemData>(
+    ): LiveData<PagedList<ArticleItem>> {
+        val builder = LivePagedListBuilder<Int, ArticleItem>(
             dataFactory,
             listConfig
         )
@@ -66,7 +66,7 @@ class ArticlesViewModel(handle: SavedStateHandle): BaseViewModel<ArticlesState>(
             .build()
     }
 
-    private fun itemAtEndHandle(lastLoadedArticle: ArticleItemData) {
+    private fun itemAtEndHandle(lastLoadedArticle: ArticleItem) {
         Log.e(TAG,"itemAtEndHanldle")
         val item = viewModelScope.launch (Dispatchers.IO){
             val items = repository.loadArticlesFromNetwork(
@@ -118,13 +118,13 @@ data class ArticlesState(
 
 class ArticlesBoundaryCallback(
     val zeroLoadingHandle: () -> Unit,
-    val itemAtEndHanldle: (ArticleItemData) -> Unit
-): PagedList.BoundaryCallback<ArticleItemData>(){
+    val itemAtEndHanldle: (ArticleItem) -> Unit
+): PagedList.BoundaryCallback<ArticleItem>(){
     override fun onZeroItemsLoaded() {
         zeroLoadingHandle()
     }
 
-    override fun onItemAtEndLoaded(itemAtEnd: ArticleItemData) {
+    override fun onItemAtEndLoaded(itemAtEnd: ArticleItem) {
         itemAtEndHanldle(itemAtEnd)
     }
 

@@ -1,7 +1,7 @@
 package ru.skillbranch.skillarticles.data
 
+import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
 import ru.skillbranch.skillarticles.data.models.ArticleData
-import ru.skillbranch.skillarticles.data.models.ArticleItemData
 import ru.skillbranch.skillarticles.data.models.CommentItemData
 import ru.skillbranch.skillarticles.data.models.User
 import ru.skillbranch.skillarticles.extensions.TimeUnits
@@ -10,7 +10,7 @@ import java.util.*
 import kotlin.random.Random.Default.nextBoolean
 
 object EntityGenerator {
-    fun generateArticle(article: ArticleItemData): ArticleData = ArticleData(
+    fun generateArticle(article: ArticleItem): ArticleData = ArticleData(
         id = article.id,
         title = article.title,
         category = article.category,
@@ -30,7 +30,7 @@ object EntityGenerator {
         date = article.date
     )
 
-    fun generateArticleItems(count: Int): List<ArticleItemData> =
+    fun generateArticleItems(count: Int): List<ArticleItem> =
         Array(count) { articleItems[it % 6] }
             .toList()
             .mapIndexed { index, article ->
@@ -67,7 +67,7 @@ object EntityGenerator {
             acc
         }
 
-    fun createArticleItem(articleId: String): ArticleItemData {
+    fun createArticleItem(articleId: String): ArticleItem {
         return articleItems[articleId.toInt() % 6].copy(id = articleId,
             commentCount = (10..40).random(),
             readDuration = (2..10).random(),
@@ -78,7 +78,7 @@ object EntityGenerator {
 
 private val articleItems = Array(6) {
     when (it) {
-        1 -> ArticleItemData(
+        1 -> ArticleItem(
             id = "0",
             categoryIcon = "https://skill-branch.ru/img/mail/bot/android-category.png",
             category = "Android",
@@ -89,7 +89,7 @@ private val articleItems = Array(6) {
             poster = "https://miro.medium.com/max/800/1*Cd_1M-LJ46t6xo79LfMGVw.jpeg"
         )
 
-        2 -> ArticleItemData(
+        2 -> ArticleItem(
             id = "0",
             categoryIcon = "https://skill-branch.ru/img/mail/bot/android-category.png",
             category = "Android",
@@ -98,9 +98,9 @@ private val articleItems = Array(6) {
             author = "Veronika Petruskova",
             authorAvatar = "https://miro.medium.com/fit/c/96/96/1*VSq5CqY3y1Bb4CLK83ZIuw.png",
             poster = "https://miro.medium.com/max/1920/1*u4uWVOpqFCR1gGpJTewhhA.jpeg"
-            )
+        )
 
-        3 -> ArticleItemData(
+        3 -> ArticleItem(
             id = "0",
             categoryIcon = "https://skill-branch.ru/img/mail/bot/android-category.png",
             category = "Android",
@@ -109,9 +109,9 @@ private val articleItems = Array(6) {
             author = "Sagar Begale",
             authorAvatar = "https://miro.medium.com/fit/c/96/96/2*0yEmon3hJKcxVIXjSJeR3Q.jpeg",
             poster = "https://miro.medium.com/max/1600/0*BDD1KysQZFMeH3pc.png"
-            )
+        )
 
-        4 -> ArticleItemData(
+        4 -> ArticleItem(
             id = "0",
             categoryIcon = "https://skill-branch.ru/img/mail/bot/android-category.png",
             category = "Android",
@@ -122,7 +122,7 @@ private val articleItems = Array(6) {
             poster = "https://miro.medium.com/max/6000/0*QocVcbGZ4MeJbTCZ"
         )
 
-        5 -> ArticleItemData(
+        5 -> ArticleItem(
             id = "0",
             categoryIcon = "https://skill-branch.ru/img/mail/bot/android-category.png",
             category = "Android",
@@ -132,7 +132,7 @@ private val articleItems = Array(6) {
             authorAvatar = "https://miro.medium.com/fit/c/96/96/2*0yEmon3hJKcxVIXjSJeR3Q.jpeg",
             poster = "https://miro.medium.com/max/4011/1*voHEHCw6ZWrWGMmZ_xtpBQ.png"
         )
-        else -> ArticleItemData(
+        else -> ArticleItem(
             id = "0",
             categoryIcon = "https://skill-branch.ru/img/mail/bot/android-category.png",
             category = "Android",
@@ -141,7 +141,7 @@ private val articleItems = Array(6) {
             title = "Drawing a rounded corner background on text",
             description = "Let’s say that we need to draw a **rounded** corner background on text, supporting the following cases",
             poster = "https://miro.medium.com/max/4209/1*GHjquSrfS6bNSjr_rsDSJw.png"
-            )
+        )
     }
 }.toList()
 

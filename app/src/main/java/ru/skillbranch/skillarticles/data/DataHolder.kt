@@ -8,7 +8,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.skillbranch.skillarticles.data.EntityGenerator.generateArticleItems
 import ru.skillbranch.skillarticles.data.EntityGenerator.generateComments
-import ru.skillbranch.skillarticles.data.models.*
+import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
+import ru.skillbranch.skillarticles.data.local.entities.ArticlePersonalInfo
+import ru.skillbranch.skillarticles.data.models.AppSettings
+import ru.skillbranch.skillarticles.data.models.ArticleData
+import ru.skillbranch.skillarticles.data.models.CommentItemData
+import ru.skillbranch.skillarticles.data.models.User
 import java.util.*
 
 object LocalDataHolder {
@@ -16,13 +21,13 @@ object LocalDataHolder {
     private val settings = MutableLiveData(AppSettings())
     private val isAuth = MutableLiveData(false)
 //    val localArticleItems: MutableList<ArticleItemData> = EntityGenerator.generateArticleItems(200) as MutableList<ArticleItemData>
-    val localArticleItems: MutableList<ArticleItemData> = mutableListOf()
+    val LOCAL_ARTICLE_ITEMS: MutableList<ArticleItem> = mutableListOf()
     val localArticles: MutableMap<String, MutableLiveData<ArticleData>> = mutableMapOf()
 
     fun findArticle(articleId: String): LiveData<ArticleData?> {
         if (localArticles[articleId] == null) {
             Log.e("DataHolder", "findArticle $articleId: ");
-            val article = localArticleItems.find { it.id == articleId }
+            val article = LOCAL_ARTICLE_ITEMS.find { it.id == articleId }
             localArticles[articleId] = MutableLiveData(EntityGenerator.generateArticle(article ?: EntityGenerator.createArticleItem(articleId)))
         }
         return localArticles[articleId]!!
@@ -31,16 +36,20 @@ object LocalDataHolder {
     fun findArticlePersonalInfo(articleId: String): LiveData<ArticlePersonalInfo?> {
         GlobalScope.launch {
             delay(500)
-            articleInfo.postValue(ArticlePersonalInfo(isBookmark = true))
+            articleInfo.postValue(
+                ArticlePersonalInfo(
+                    isBookmark = true
+                )
+            )
         }
         return articleInfo
     }
 
-    fun findBookmarks() : List<ArticleItemData>{
+    fun findBookmarks() : List<ArticleItem>{
         GlobalScope.launch {
             delay(500)
         }
-        return  localArticleItems.filter { it.isBookmark }
+        return  LOCAL_ARTICLE_ITEMS.filter { it.isBookmark }
     }
 
     fun getAppSettings() = settings
@@ -67,10 +76,10 @@ object LocalDataHolder {
 
 object NetworkDataHolder {
 
-    val networkArticleItems: List<ArticleItemData> = generateArticleItems(200)
+    val NETWORK_ARTICLE_ITEMS: List<ArticleItem> = generateArticleItems(200)
 
     val commentsData: Map<String, MutableList<CommentItemData>> by lazy {
-        networkArticleItems.associate { article ->
+        NETWORK_ARTICLE_ITEMS.associate { article ->
             article.id to generateComments(article.id, article.commentCount) as MutableList
         }
     }
