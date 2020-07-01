@@ -11,7 +11,7 @@ import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 
 class ArticlesAdapter(
     private val listener: (ArticleItem) -> Unit,
-    private val toggleBookmarkListener: (articleId: String, isBookmark: Boolean) -> Unit
+    private val toggleBookmarkListener: (articleId: String) -> Unit
 
 ):PagedListAdapter<ArticleItem, ArticleVH>(ArticleDiffCallBack()) {
 
@@ -39,7 +39,7 @@ class ArticleVH(
     fun bind(
         item: ArticleItem?,
         listener: (ArticleItem) -> Unit,
-        toggleBookmarkListener: (articleId: String, checked: Boolean) -> Unit
+        toggleBookmarkListener: (articleId: String) -> Unit
     ){
         (containerView as ArticleItemView).bind(item!!,toggleBookmarkListener) //  null
         itemView.setOnClickListener { listener(item!!) }
