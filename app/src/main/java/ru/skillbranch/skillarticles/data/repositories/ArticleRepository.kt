@@ -5,50 +5,96 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import androidx.paging.ItemKeyedDataSource
-import ru.skillbranch.skillarticles.data.LocalDataHolder
 import ru.skillbranch.skillarticles.data.NetworkDataHolder
+import ru.skillbranch.skillarticles.data.local.DbManager.db
 import ru.skillbranch.skillarticles.data.local.PrefManager
-import ru.skillbranch.skillarticles.data.local.entities.ArticlePersonalInfo
+import ru.skillbranch.skillarticles.data.local.entities.ArticleFull
 import ru.skillbranch.skillarticles.data.models.AppSettings
-import ru.skillbranch.skillarticles.data.models.ArticleData
 import ru.skillbranch.skillarticles.data.models.CommentItemData
 import ru.skillbranch.skillarticles.data.models.User
+import ru.skillbranch.skillarticles.extensions.data.toArticleContent
 import java.lang.Thread.sleep
 
-object ArticleRepository {
+interface IArticleRepository {
+    fun findArticle(articleId: String): LiveData<ArticleFull>
+    fun getAppSettings(): LiveData<AppSettings>
+    fun toggleLike(articleId: String)
+    fun toggleBookmark(articleId: String)
+    fun isAuth(): MutableLiveData<Boolean>
+    fun loadCommentsByRange(slug: String?, size: Int,articleId: String): List<CommentItemData>
+    fun sendMessage(articleId: String,text:String, answerToSlug: String?)
+    fun loadAllComments(articleId: String, total: Int):CommentsDataFactory
+    fun decrementLike(articleId: String)
+    fun incrementLike(articleId: String)
+    fun updateSettings(copy: AppSettings)
+    fun fetchArticleComment(articleId: String)
+    fun findArticleCommentCount(articleId: String): LiveData<Int>
+
+}
+
+object ArticleRepository : IArticleRepository {
     private val network = NetworkDataHolder
-    private val prefrences = PrefManager
+    private val preferences = PrefManager
 
-    fun loadArticleContent(articleId: String): LiveData<List<MarkdownElement>?> {
-        return MutableLiveData(emptyList())
-        }
-    }
-    fun getArticle(articleId: String): LiveData<ArticleData?> {
-        return MutableLiveData(null)
-    }
+    private val articlesDao = db.articlesDao()
+    private val articlePersonalDao = db.articlePersonalInfosDao()
+    private val articleCountsDao = db.articleCountsDao()
+    private val articleContentDao = db.articlesContentDao()
 
-    fun loadArticlePersonalInfo(articleId: String): LiveData<ArticlePersonalInfo?> {
-        return MutableLiveData(null)
+
+    override fun findArticle(articleId: String): LiveData<ArticleFull> {
+        return articlesDao.findFullArticle(articleId)
     }
 
-    fun getAppSettings(): LiveData<AppSettings> = PrefManager.getAppSettings() //from preferences
-
-    fun updateSettings(appSettings: AppSettings) {
+    override fun toggleLike(articleId: String) {
+        articlePersonalDao.toggleLikeOrInsert(articleId)
     }
 
-    fun updateArticlePersonalInfo(info: ArticlePersonalInfo) {
+    override fun toggleBookmark(articleId: String) {
+        articlePersonalDao.toggleBookmarkOrInsert(articleId)
     }
 
-    fun isAuth(): MutableLiveData<Boolean> = PrefManager.isAuth()
 
-    fun allComments(articleId: String,totalCount: Int) = CommentsDataFactory(
+    override fun decrementLike(articleId: String) {
+        articleCountsDao.decrementLike(articleId)
+    }
+
+    override fun incrementLike(articleId: String) {
+        articleCountsDao.incrementLike(articleId)
+    }
+
+    override fun updateSettings(copy: AppSettings) {
+        // TODO implement me
+    }
+
+    override fun fetchArticleComment(articleId: String) {
+        val content = network.loadArticleContent(articleId).apply { sleep(1500) }
+        articleContentDao.insert(content.toArticleContent())
+    }
+
+    override fun findArticleCommentCount(articleId: String): LiveData<Int> {
+        return articleCountsDao.getCommentsCount(articleId)
+    }
+
+
+    override fun getAppSettings(): LiveData<AppSettings> =
+        PrefManager.getAppSettings() //from preferences
+
+    override fun isAuth(): MutableLiveData<Boolean> = PrefManager.isAuth()
+
+    override fun loadAllComments(articleId: String, total: Int) = CommentsDataFactory(
         itemProvider = ::loadCommentsByRange,
         articleId = articleId,
-        totalCount = totalCount)
+        totalCount = total
+    )
 
-    private fun loadCommentsByRange(slug: String?,size: Int, articleId: String): List<CommentItemData>{
-        val data = network.commentsData.getOrElse(articleId){ mutableListOf()}
-        return when{
+    override fun loadCommentsByRange(
+        slug: String?,
+        size: Int,
+        articleId: String
+    ): List<CommentItemData> {
+        val data = network.commentsData.getOrElse(articleId) { mutableListOf() }
+        return when {
             slug == null -> data.take(size)
 
             size > 0 -> data.dropWhile { it.slug != slug }
@@ -63,11 +109,12 @@ object ArticleRepository {
         }.apply { sleep(500) }
     }
 
-    fun sendComment(articleId: String, comment: String, answerToSlug: String?) {
-        network.sendMessage(articleId,comment,answerToSlug,
-            User("777", "John Doe","https://skill-branch.ru/img/bot/android-category.png")
+    override fun sendMessage(articleId: String, comment: String, answerToSlug: String?) {
+        network.sendMessage(
+            articleId, comment, answerToSlug,
+            User("777", "John Doe", "https://skill-branch.ru/img/bot/android-category.png")
         )
-        local.incrementCommentsCount(articleId)
+        articleCountsDao.incrementCommentsCount(articleId)
     }
 }
 
@@ -84,14 +131,14 @@ class CommentsDataSource(
     private val articleId: String,
     private val totalCount: Int
 ): ItemKeyedDataSource<String,CommentItemData>(){
-    private val TAG = "CommentsDataFactory"
+    private val TAG = CommentsDataSource::class.simpleName
 
     override fun loadInitial(
         params: LoadInitialParams<String>,
         callback: LoadInitialCallback<CommentItemData>
     ) {
         val result = itemProvider(params.requestedInitialKey, params.requestedLoadSize, articleId)
-        Log.e(TAG,"loadInitial InitialKeykey = ${params.requestedInitialKey} size = ${params.requestedLoadSize} totalCount = $totalCount")
+        Log.e(TAG,"loadInitial InitialKey = ${params.requestedInitialKey} size = ${params.requestedLoadSize} totalCount = $totalCount")
         callback.onResult(
             if(totalCount > 0) result else emptyList(),
             0,

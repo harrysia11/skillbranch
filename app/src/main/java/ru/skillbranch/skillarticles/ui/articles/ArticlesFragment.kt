@@ -11,6 +11,7 @@ import android.widget.CursorAdapter
 import android.widget.SearchView
 import android.widget.SimpleCursorAdapter
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_articles.*
@@ -30,6 +31,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
     override val viewModel: ArticlesViewModel by viewModels()
     override val layout: Int = R.layout.fragment_articles
     override val binding: ArticlesBinding by lazy{ ArticlesBinding()}
+    private val args: ArticlesFragmentArgs by navArgs()
     private lateinit var suggestionAdapter: SimpleCursorAdapter
 
     override val prepareToolbar: (ToolbarBuilder.() -> Unit)?
@@ -78,7 +80,8 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
                     item.poster
                 )
                 viewModel.navigate(
-                    NavigationCommand.To(direction.actionId, direction.arguments))
+                    NavigationCommand.To(direction.actionId, direction.arguments)
+                )
             }
         }
 
@@ -124,7 +127,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         if(binding.isSearch){
             menuItem.expandActionView()
             searchView.setQuery(binding.searchQuery, false)
-            if(binding.isFocusedSearch) searchView.requestFocus()
+            if(binding.isSearch) searchView.requestFocus()
             else searchView.clearFocus()
         }
 
@@ -180,7 +183,8 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
             adapter = articlesAdapter
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
         }
-        viewModel.observeList(viewLifecycleOwner){
+        viewModel.observeList(viewLifecycleOwner, args.isBookmark
+        ){
             articlesAdapter.submitList(it)
         }
 

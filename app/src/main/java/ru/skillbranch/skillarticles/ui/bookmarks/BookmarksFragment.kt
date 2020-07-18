@@ -1,7 +1,6 @@
 package ru.skillbranch.skillarticles.ui.bookmarks
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.SearchView
@@ -10,6 +9,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_bookmarks.*
 import ru.skillbranch.skillarticles.R
+import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
 import ru.skillbranch.skillarticles.ui.articles.ArticlesAdapter
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
 import ru.skillbranch.skillarticles.ui.base.MenuItemHolder
@@ -23,24 +23,26 @@ class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
 
     //lateinit var viewModel: BookmarksViewModel
     private val articlesAdapter = ArticlesAdapter(
-        { item -> Log.e("Bookmarks", "click on article ${item.id}")
-            val direction = BookmarksFragmentDirections.actionNavBookmarksToPageArticle2(
-                item.id,
-                item.author,
-                item.authorAvatar,
-                item.category,
-                item.categoryIcon,
-                item.title,
-                item.date,
-                item.poster
-            )
-            //       findNavController().navigate(direction)
-            viewModel.navigate(
-                NavigationCommand.To(direction.actionId, direction.arguments)
-            )
-
-        },
-        ::toggleIsBookmark
+        { item:ArticleItem, isToggleBookmark: Boolean ->
+            if (isToggleBookmark) {
+                viewModel.handleToggleBookmark(item.id)
+            } else {
+                val direction = BookmarksFragmentDirections.actionNavBookmarksToPageArticle2(
+                    item.id,
+                    item.author,
+                    item.authorAvatar,
+                    item.category,
+                    item.categoryIcon,
+                    item.title,
+                    item.date,
+                    item.poster
+                )
+                //       findNavController().navigate(direction)
+                viewModel.navigate(
+                    NavigationCommand.To(direction.actionId, direction.arguments)
+                )
+            }
+        }
     )
 
     override val prepareToolbar: (ToolbarBuilder.() -> Unit)?

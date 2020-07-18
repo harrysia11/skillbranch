@@ -5,13 +5,11 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.extensions.LayoutContainer
 import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
 import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 
 class ArticlesAdapter(
-    private val listener: (ArticleItem) -> Unit,
-    private val toggleBookmarkListener: (articleId: String) -> Unit
+    private val listener: (ArticleItem, Boolean) -> Unit
 
 ):PagedListAdapter<ArticleItem, ArticleVH>(ArticleDiffCallBack()) {
 
@@ -22,7 +20,7 @@ class ArticlesAdapter(
     }
 
     override fun onBindViewHolder(holder: ArticleVH, position: Int) {
-        holder.bind(getItem(position), listener, toggleBookmarkListener)
+        holder.bind(getItem(position), listener)
     }
 }
 class ArticleDiffCallBack: DiffUtil.ItemCallback<ArticleItem>(){
@@ -33,41 +31,13 @@ class ArticleDiffCallBack: DiffUtil.ItemCallback<ArticleItem>(){
 }
 
 class ArticleVH(
-    override val containerView: View
-): RecyclerView.ViewHolder(containerView), LayoutContainer{
+    private val containerView: View
+): RecyclerView.ViewHolder(containerView){
 
     fun bind(
         item: ArticleItem?,
-        listener: (ArticleItem) -> Unit,
-        toggleBookmarkListener: (articleId: String) -> Unit
+        listener: (ArticleItem,Boolean) -> Unit
     ){
-        (containerView as ArticleItemView).bind(item!!,toggleBookmarkListener) //  null
-        itemView.setOnClickListener { listener(item!!) }
-
-//        val posterSize = containerView.context.dpToIntPx(64)
-//        val cornerRadius = containerView.context.dpToIntPx(8)
-//        val categorySize = containerView.context.dpToIntPx(40)
-//
-//        Glide.with(containerView.context)
-//            .load(item.poster)
-//            .transform(CenterCrop(),RoundedCorners(cornerRadius))
-//            .override(posterSize)
-//            .into(iv_poster)
-//
-//        Glide.with(containerView.context)
-//            .load(item.categoryIcon)
-//            .transform(CenterCrop(),RoundedCorners(cornerRadius))
-//            .override(categorySize)
-//            .into(iv_category)
-//
-//        tv_date.text = item.date.format()
-//        tv_author.text = item.author
-//        tv_title.text = item.title
-//        tv_description.text = item.description
-//        tv_likes_count.text = "${item.likeCount}"
-//        tv_comments_count.text = "${item.commentCount}"
-//        tv_read_duration.text = "${item.readDuration} min read"
-//
-//        itemView.setOnClickListener { listener(item) }
+        (containerView as ArticleItemView).bind(item!!,listener) //  null
     }
 }

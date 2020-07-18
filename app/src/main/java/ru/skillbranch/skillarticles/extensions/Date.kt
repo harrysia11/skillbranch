@@ -21,6 +21,11 @@ fun Date.format(pattern: String = "HH:mm:ss dd.MM.yy"): String {
     return dateFormat.format(this)
 }
 
+fun Date.shortFormat(pattern: String = "d.MM.yy"): String {
+    val dateFormat = SimpleDateFormat(pattern, Locale("ru"))
+    return dateFormat.format(this)
+}
+
 fun Date.add(value: Int, unit:TimeUnits): Date{
     this.time +=  value * unit.duration
     return this

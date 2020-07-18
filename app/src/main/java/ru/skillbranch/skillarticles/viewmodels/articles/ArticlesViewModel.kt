@@ -37,8 +37,10 @@ class ArticlesViewModel(handle: SavedStateHandle): BaseViewModel<ArticlesState>(
 
     fun observeList(
         owner: LifecycleOwner,
+        isBookmark: Boolean = false,
         onChange: (list: PagedList<ArticleItem>) -> Unit
     ){
+        updateState { it.copy(isBookmark = false) }
         listData.observe(owner,
             Observer{onChange(it)}
         )
@@ -134,7 +136,6 @@ class ArticlesViewModel(handle: SavedStateHandle): BaseViewModel<ArticlesState>(
        repository.findCategoriesData().observe(owner, Observer(onChange)) }
     }
 
-}
 
 private fun ArticlesState.toArticleFilter(): ArticleFilter =
     ArticleFilter(

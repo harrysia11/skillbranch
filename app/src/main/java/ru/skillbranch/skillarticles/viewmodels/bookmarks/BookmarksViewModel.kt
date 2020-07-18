@@ -7,8 +7,6 @@ import androidx.paging.PagedList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
-import ru.skillbranch.skillarticles.data.repositories.ArticleStrategy
-import ru.skillbranch.skillarticles.data.repositories.ArticlesDataFactory
 import ru.skillbranch.skillarticles.data.repositories.ArticlesRepository
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesBoundaryCallback
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
@@ -30,10 +28,9 @@ class BookmarksViewModel(handler:SavedStateHandle ): BaseViewModel<BookmarksStat
     }
 
     private val listData = Transformations.switchMap(state) {
-        when {
-            it.isSearch && !it.queryString.isNullOrBlank() -> buildPageList(repository.searchBookmarks(currentState.queryString!!))
-            else -> buildPageList(repository.loadBookmarks())
-        }
+        val filter = it.toBookmarkFilter()
+        return@switchMap buildPageList(repository.rawQueryArticles(filter))
+
     }
 
     private fun buildPageList(
@@ -84,9 +81,10 @@ class BookmarksViewModel(handler:SavedStateHandle ): BaseViewModel<BookmarksStat
         )
     }
 
-    fun handleToggleBookmark(articlesId: String, bookmark: Boolean) {
-        repository.updateBookmark(articlesId,bookmark)
-        listData.value?.dataSource?.invalidate()
+    fun handleToggleBookmark(articleId:String){
+        viewModelScope.launch {
+            repository.toggleBookmark(articleId)
+        }
     }
 
     fun handleSearchMode(isSearch: Boolean) {
@@ -100,6 +98,9 @@ class BookmarksViewModel(handler:SavedStateHandle ): BaseViewModel<BookmarksStat
     }
 
 }
+
+
+
 data class BookmarksState(
     var isSearch: Boolean = false,
     var queryString: String? = null
