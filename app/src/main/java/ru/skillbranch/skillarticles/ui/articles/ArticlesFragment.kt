@@ -52,7 +52,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
                 null
             ){
                 menuItem ->
-                val action = ArticleFragmentDirections.choseCategory(
+                val action = ArticlesFragmentDirections.choseCategory(
                     binding.selectedCategories.toTypedArray(),
                     binding.categories.toTypedArray()
                 )
@@ -202,7 +202,6 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         var searchQuery: String? = null
         var isSearch: Boolean = false
         var isLoading: Boolean by RenderProp(true) {
-            // TODO show shimmer on rv_list
         }
 
         var isHashTagSearch: Boolean by RenderProp(false)
@@ -231,7 +230,5 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
                 suggestionAdapter.changeCursor(cursor)
             }
         }
-
-        // TODO save UI
     }
 }
