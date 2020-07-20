@@ -10,7 +10,9 @@ import android.widget.AutoCompleteTextView
 import android.widget.CursorAdapter
 import android.widget.SearchView
 import android.widget.SimpleCursorAdapter
+//import androidx.cursoradapter.widget.CursorAdapter
 import androidx.fragment.app.viewModels
+//import androidx.appcompat.widget.SearchView
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -132,7 +134,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         }
 
         val autoTv = searchView.findViewById<AutoCompleteTextView>(R.id.search_src_text)
-        autoTv.threshold = 1
+        autoTv?.threshold = 1
 
         searchView.suggestionsAdapter = suggestionAdapter
         searchView.setOnSuggestionListener(object:SearchView.OnSuggestionListener{

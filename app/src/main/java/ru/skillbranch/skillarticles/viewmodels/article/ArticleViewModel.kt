@@ -111,7 +111,7 @@ class ArticleViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             repository.toggleLike(articleId)
             if(isLiked) repository.decrementLike(articleId) else repository.incrementLike(articleId)
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.Main){
                 notify(msg)
             }
         }

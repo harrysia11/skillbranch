@@ -57,7 +57,7 @@ object ArticlesRepository: IArticlesRepository {
         tagsDao.insert(tags)
         tagsDao.insertRefs(refs.map { ArticleTagXRef(it.first, it.second) })
 
-        val categories = articles.map { it.data.category }
+        val categories = articles.map { it.data.category }.distinct()
 
         categoriesDao.insert(categories)
     }
@@ -124,7 +124,7 @@ object ArticlesRepository: IArticlesRepository {
         fun build(): String {
             check(table != null) { "table must be not null" }
             val strBuilder = StringBuilder("SELECT $selectColumns")
-                .append("FROM $table")
+                .append(" FROM $table")
 
             if (joinTables != null) strBuilder.append(joinTables)
 
@@ -135,8 +135,8 @@ object ArticlesRepository: IArticlesRepository {
             return strBuilder.toString()
         }
 
-        fun appendWhere(condition: String, logic: String = "AND"): QueryBuilder {
-            if (whereCondition.isNullOrEmpty()) this.whereCondition = "WHERE  $condition"
+        fun appendWhere(condition: String, logic: String = " AND "): QueryBuilder {
+            if (whereCondition.isNullOrEmpty()) this.whereCondition = " WHERE  $condition "
             else whereCondition += " $logic $condition "
             return this
         }
@@ -147,12 +147,12 @@ object ArticlesRepository: IArticlesRepository {
         }
 
         fun orderBy(column: String, isDesc: Boolean = true): QueryBuilder {
-            order = "ORDER BY $column ${if (isDesc) "DESC" else "ASC"}"
+            order = " ORDER BY $column ${if (isDesc) " DESC" else " ASC"}"
             return this
         }
 
         fun innerJoin(table: String, on: String): QueryBuilder {
-            if (joinTables.isNullOrEmpty()) joinTables = "INNER JOIN $table ON $on"
+            if (joinTables.isNullOrEmpty()) joinTables = " INNER JOIN $table ON $on"
             else joinTables += " INNER JOIN $table ON $on "
             return this
         }

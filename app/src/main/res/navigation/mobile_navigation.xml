@@ -47,6 +47,10 @@
         <action
             android:id="@+id/chose_category"
             app:destination="@id/dialog_chose_category" />
+        <argument
+            android:name="isBookmark"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/nav_profile"

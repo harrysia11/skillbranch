@@ -13,6 +13,6 @@
         android:icon="@drawable/ic_filter_list_blac_24"
         android:title="@string/menu_title_filter"/>
 
-<!--    app:actionViewClass="androidx.appcompat.widget.SearchView" -->
+    <!--app:actionViewClass="androidx.appcompat.widget.SearchView" -->
 
 </menu>
