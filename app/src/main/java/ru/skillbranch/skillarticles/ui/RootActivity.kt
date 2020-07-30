@@ -11,6 +11,7 @@ import kotlinx.android.synthetic.main.layout_bottombar.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.selectDestination
 import ru.skillbranch.skillarticles.ui.base.BaseActivity
+import ru.skillbranch.skillarticles.viewmodels.RootState
 import ru.skillbranch.skillarticles.viewmodels.RootViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
@@ -20,6 +21,7 @@ class RootActivity : BaseActivity<RootViewModel>() {
 
     override val layout: Int = R.layout.activity_root
     public override val viewModel: RootViewModel by viewModels()
+    var isAuth : Boolean = false
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +46,11 @@ class RootActivity : BaseActivity<RootViewModel>() {
             controller, destination, arguments ->
             nav_view.selectDestination(destination)
 
-//            if(destination.id == R.id.nav_auth) nav_view.selectItem(arguments?.get("private_destination") as Int?)
+            if(isAuth && destination.id == R.id.nav_auth){
+                controller.popBackStack()
+                val private = arguments?.get("private_destination") as Int?
+                if(private !=null) controller.navigate(private)
+            }
 
         }
 
@@ -82,7 +88,8 @@ class RootActivity : BaseActivity<RootViewModel>() {
     }
 
     override fun subscribeOnState(state: IViewModelState) {
-        // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        state as RootState
+        isAuth = state.isAuth
     }
 
 }
