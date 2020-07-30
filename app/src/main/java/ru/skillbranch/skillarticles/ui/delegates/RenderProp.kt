@@ -7,16 +7,11 @@ import kotlin.reflect.KProperty
 
 class RenderProp<T: Any>(
     var value: T,
-    val needInit: Boolean = true,
+    private val needInit: Boolean = true,
     private val onChange: ((T) -> Unit)? = null
 ) : ReadWriteProperty<Binding, T> {
 
     private val listeners: MutableList<() -> Unit> = mutableListOf()
-
-    init {
-        Log.e("RenderProp","init()")
-        if(needInit) onChange?.invoke(value)
-    }
 
     fun bind(){
         if(needInit) onChange?.invoke(value)
@@ -37,28 +32,17 @@ class RenderProp<T: Any>(
         listeners.add(listener)
     }
 
-    private fun registerDelegate(thisRef: Binding, name: String, delegate: RenderProp<Any>){
-        thisRef.delegates[name] = delegate
-    }
-}
-
-class ObserveProp<T : Any>(
-    private var value: T,
-    private val onChange: ((T) -> Unit)? = null
-){
-
-    operator fun provideDelegate(
-        thisRef: Binding,
-        prop: KProperty<*>
-    ): ReadWriteProperty<Binding, T>{
-
-        val delegate = RenderProp(value, true, onChange)
-        registerDelegate(thisRef,prop.name,delegate)
-        return delegate
-    }
-
     private fun registerDelegate(thisRef: Binding, name: String, delegate: RenderProp<T>){
         thisRef.delegates[name] = delegate
     }
 
+    operator fun provideDelegate(
+       thisRef: Binding,
+       prop: KProperty<*>
+    ): ReadWriteProperty<Binding, T>{
+        val delegate = RenderProp(value,true,onChange)
+        registerDelegate(thisRef, prop.name, delegate)
+        return delegate
+    }
 }
+

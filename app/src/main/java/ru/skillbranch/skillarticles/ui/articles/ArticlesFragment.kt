@@ -1,5 +1,7 @@
 package ru.skillbranch.skillarticles.ui.articles
 
+//import androidx.cursoradapter.widget.CursorAdapter
+//import androidx.appcompat.widget.SearchView
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
@@ -10,13 +12,12 @@ import android.widget.AutoCompleteTextView
 import android.widget.CursorAdapter
 import android.widget.SearchView
 import android.widget.SimpleCursorAdapter
-//import androidx.cursoradapter.widget.CursorAdapter
-import androidx.fragment.app.viewModels
-//import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_articles.*
+import kotlinx.android.synthetic.main.search_view_layout.view.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.local.entities.CategoryData
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
@@ -30,7 +31,7 @@ import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
 
 class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
-    override val viewModel: ArticlesViewModel by viewModels()
+    override val viewModel: ArticlesViewModel by activityViewModels()
     override val layout: Int = R.layout.fragment_articles
     override val binding: ArticlesBinding by lazy{ ArticlesBinding()}
     private val args: ArticlesFragmentArgs by navArgs()
@@ -63,10 +64,6 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         )
     }
 
-    private fun toggleIsBookmark(articlesId: String){
-        viewModel.handleToggleBookmark(articlesId)
-    }
-
     private val articlesAdapter:ArticlesAdapter = ArticlesAdapter { item,isToggleBookmark ->
             if (isToggleBookmark) {
                 viewModel.handleToggleBookmark(item.id)
@@ -94,8 +91,8 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         suggestionAdapter = SimpleCursorAdapter(
             context,
             android.R.layout.simple_list_item_1,
-            null,
-            arrayOf("tag"),
+            null, // cursor
+            arrayOf("tag"), // cursor columns
             intArrayOf(android.R.id.text1),
             CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER
         )
@@ -129,8 +126,8 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         if(binding.isSearch){
             menuItem.expandActionView()
             searchView.setQuery(binding.searchQuery, false)
-            if(binding.isSearch) searchView.requestFocus()
-            else searchView.clearFocus()
+//            if(binding.isSearch) searchView.requestFocus()
+//            else searchView.clearFocus()
         }
 
         val autoTv = searchView.findViewById<AutoCompleteTextView>(R.id.search_src_text)
@@ -198,16 +195,22 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
             binding.categories = it
         }
     }
+
+    override fun onDestroyView() {
+        toolbar.search_view?.setOnQueryTextListener(null)
+        super.onDestroyView()
+    }
+
     inner class ArticlesBinding: Binding(){
         var categories: List<CategoryData> = emptyList()
-        var selectedCategories: List<String> by RenderProp(emptyList())
+        var selectedCategories: List<String> by RenderProp(emptyList<String>())
         var searchQuery: String? = null
         var isSearch: Boolean = false
         var isLoading: Boolean by RenderProp(true) {
         }
 
         var isHashTagSearch: Boolean by RenderProp(false)
-        var tags: List<String> by RenderProp(emptyList())
+        var tags: List<String> by RenderProp(emptyList<String>())
 
         override fun bind(data: IViewModelState) {
             data as ArticlesState
@@ -221,7 +224,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
 
         override val afterInflated: (() -> Unit)? = {
             dependsOn<Boolean, List<String>>(::isHashTagSearch, ::tags) {ihs,tags ->
-                val cursor = MatrixCursor(
+                val cursor = android.database.MatrixCursor(
                     arrayOf(BaseColumns._ID,"tag")
                 )
                 if(ihs && tags.isNotEmpty()){

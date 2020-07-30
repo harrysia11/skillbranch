@@ -389,14 +389,14 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         }
 
         private var searchResults: List<Pair<Int,Int>> by RenderProp(
-            emptyList()
+            emptyList<Pair<Int,Int>>()
         )
         {
             //   if(it != null && it.isNotEmpty()) renderSearchResult(it)
         }
         private var searchPosition: Int by RenderProp(0)
 
-        private var content: List<MarkdownElement> by RenderProp(emptyList())
+        private var content: List<MarkdownElement> by RenderProp(emptyList<MarkdownElement>())
         {
             tv_text_content.isLoading = it.isEmpty()
             tv_text_content.setContent(it)

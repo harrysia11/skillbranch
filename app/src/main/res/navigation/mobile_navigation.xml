@@ -78,9 +78,6 @@
             <action
                 android:id="@+id/action_nav_auth_to_page_privacy_policy"
                 app:destination="@id/page_privacy_policy" />
-            <action
-                android:id="@+id/action_nav_auth_to_page_privacy_policy2"
-                app:destination="@id/page_privacy_policy" />
         </fragment>
         <fragment
             android:id="@+id/page_privacy_policy"

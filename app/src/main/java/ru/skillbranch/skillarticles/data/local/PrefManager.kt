@@ -8,12 +8,12 @@ import ru.skillbranch.skillarticles.App
 import ru.skillbranch.skillarticles.data.models.AppSettings
 
 object PrefManager {
-    internal val prefrences : SharedPreferences by lazy {
+    internal val preferences : SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(App.applicationContext())
     }
 
     fun clearAll(){
-        prefrences.edit().clear().apply()
+        preferences.edit().clear().apply()
     }
 
     fun getAppSettings(): LiveData<AppSettings>{

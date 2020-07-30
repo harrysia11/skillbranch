@@ -37,7 +37,7 @@ class RootActivity : BaseActivity<RootViewModel>() {
 
         nav_view.setOnNavigationItemSelectedListener {
             viewModel.navigate(NavigationCommand.To(it.itemId))
-            true
+            return@setOnNavigationItemSelectedListener true
         }
         
         navController.addOnDestinationChangedListener{

@@ -40,7 +40,7 @@ class ArticlesViewModel(handle: SavedStateHandle): BaseViewModel<ArticlesState>(
         isBookmark: Boolean = false,
         onChange: (list: PagedList<ArticleItem>) -> Unit
     ){
-        updateState { it.copy(isBookmark = false) }
+        updateState { it.copy(isBookmark = isBookmark) }
         listData.observe(owner,
             Observer{onChange(it)}
         )
@@ -98,7 +98,7 @@ class ArticlesViewModel(handle: SavedStateHandle): BaseViewModel<ArticlesState>(
             val items = repository.loadArticlesFromNetwork(start = 0, size = listConfig.initialLoadSizeHint)
             if(items.isNotEmpty()){
                 repository.insertArticlesToDb(items)
-                listData.value?.dataSource?.invalidate()
+//                listData.value?.dataSource?.invalidate()
             }
         }
     }
@@ -113,7 +113,7 @@ class ArticlesViewModel(handle: SavedStateHandle): BaseViewModel<ArticlesState>(
     }
 
     fun handleToggleBookmark(articleId:String){
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.toggleBookmark(articleId)
         }
     }
