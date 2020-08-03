@@ -36,6 +36,9 @@
         <argument
             android:name="poster"
             app:argType="string" />
+        <argument
+            android:name="is_bookmark"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/nav_articles"

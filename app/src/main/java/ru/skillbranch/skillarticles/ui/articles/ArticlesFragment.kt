@@ -76,7 +76,8 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
                     item.categoryIcon,
                     item.title,
                     item.date,
-                    item.poster
+                    item.poster,
+                    item.isBookmark
                 )
                 viewModel.navigate(
                     NavigationCommand.To(direction.actionId, direction.arguments)
