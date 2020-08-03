@@ -39,6 +39,7 @@ data class Author(
             ,description
             ,poster
             ,likes
+            ,is_bookmark
             ,comment_count
             ,read_duration
             ,article.category_id AS category_id
