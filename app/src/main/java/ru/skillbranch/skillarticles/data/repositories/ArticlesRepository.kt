@@ -82,6 +82,22 @@ object ArticlesRepository: IArticlesRepository {
         tagsDao.incrementTagUseCount(tag)
     }
 
+    fun setupTestDao(articlesDao: ArticlesDao? = null,
+                     articleCountsDao: ArticleCountsDao? = null,
+                     categoriesDao: CategoriesDao? = null,
+                     tagsDao: TagsDao? = null,
+                     articlePersonalDao: ArticlePersonalInfosDao? = null,
+                     articleContentDao: ArticleContentsDao? = null) {
+
+        if(articlesDao != null){val articlesDao = articlesDao }
+        if(articleCountsDao != null){val articleCountsDao = articleCountsDao }
+        if(categoriesDao != null){val categoriesDao = categoriesDao }
+        if(tagsDao != null){val tagsDao = tagsDao }
+        if(articlePersonalDao != null){val articlePersonalDao = articlePersonalDao }
+        if(articleContentDao != null){val articleContentDao = articleContentDao }
+    }
+
+
 }
     class ArticleFilter(
         val search: String? = null,

@@ -56,7 +56,7 @@ data class ArticleData(
     val id: String = "0",
     val authorId: String,
     val authorName: String,
-    val authorAvatar: String?,
+    val authorAvatar: String ,
     val title: String,
     val description: String,
     val content: String,

@@ -24,7 +24,7 @@ data class CategoryData(
     val icon: String,
     val title: String,
     @ColumnInfo(name = "article_count")
-    val articleCount: Int = 0
+    val articlesCount: Int = 0
 ):Parcelable{
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
@@ -38,7 +38,7 @@ data class CategoryData(
         parcel.writeString(categoryId)
         parcel.writeString(icon)
         parcel.writeString(title)
-        parcel.writeInt(articleCount)
+        parcel.writeInt(articlesCount)
     }
 
     override fun describeContents(): Int {

@@ -7,4 +7,4 @@ fun ArticleData.toArticleContentRes() : ArticleContentRes = ArticleContentRes(
     articleId = id,
     content = content,
     source = source,
-    sharedLink = shareLink)
+    shareLink = shareLink)

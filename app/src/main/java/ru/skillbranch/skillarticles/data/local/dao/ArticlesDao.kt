@@ -26,12 +26,12 @@ interface ArticlesDao : BaseDao<Article> {
     @Query("""
         SELECT * FROM articles
         """)
-    fun findArticles(): List<Article>
+    fun findArticles(): LiveData<List<Article>>
 
     @Query("""
         SELECT * FROM articles AS articles WHERE articles.id = :id
         """)
-    fun findArticleById(id: String): Article?
+    fun findArticleById(id: String): LiveData<Article?>
 
 
     @Query(
@@ -39,7 +39,7 @@ interface ArticlesDao : BaseDao<Article> {
             SELECT * FROM ArticleItem
             """
     )
-    fun findArticleItems():List<ArticleItem>
+    fun findArticleItems():LiveData<List<ArticleItem>>
 
     @Delete
     fun delete(article: Article)

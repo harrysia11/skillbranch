@@ -17,7 +17,7 @@ class ChoseCategoryDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val categories = args.categories.toList().map { "${it.title} (${it.articleCount})" }.toTypedArray()
+        val categories = args.categories.toList().map { "${it.title} (${it.articlesCount})" }.toTypedArray()
         val checked = BooleanArray(args.categories.size){
             args.selectedCategories.contains(args.categories[it].categoryId)
         }

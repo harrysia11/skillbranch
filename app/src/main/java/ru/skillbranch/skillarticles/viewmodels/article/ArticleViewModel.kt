@@ -50,7 +50,7 @@ class ArticleViewModel(
             article ?: return@subscribeOnDataSource null
             if(article.content == null) fetchContent()
             state.copy(
-                sharedLink = article.sharedLink,
+                sharedLink = article.shareLink,
                 title = article.title,
                 category = article.category.title,
                 categoryIcon = article.category.icon,
@@ -78,7 +78,7 @@ class ArticleViewModel(
 
     private fun fetchContent() {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.fetchArticleComment(articleId)
+            repository.fetchArticleContent(articleId)
         }
     }
 

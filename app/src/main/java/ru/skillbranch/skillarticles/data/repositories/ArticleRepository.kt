@@ -27,7 +27,7 @@ interface IArticleRepository {
     fun decrementLike(articleId: String)
     fun incrementLike(articleId: String)
     fun updateSettings(copy: AppSettings)
-    fun fetchArticleComment(articleId: String)
+    fun fetchArticleContent(articleId: String)
     fun findArticleCommentCount(articleId: String): LiveData<Int>
 
 }
@@ -39,7 +39,7 @@ object ArticleRepository : IArticleRepository {
     private val articlesDao = db.articlesDao()
     private val articlePersonalDao = db.articlePersonalInfosDao()
     private val articleCountsDao = db.articleCountsDao()
-    private val articleContentDao = db.articlesContentDao()
+    private val articleContentsDao = db.articleContentsDao()
 
 
     override fun findArticle(articleId: String): LiveData<ArticleFull> {
@@ -67,9 +67,9 @@ object ArticleRepository : IArticleRepository {
         // TODO implement me
     }
 
-    override fun fetchArticleComment(articleId: String) {
+    override fun fetchArticleContent(articleId: String) {
         val content = network.loadArticleContent(articleId).apply { sleep(1500) }
-        articleContentDao.insert(content.toArticleContent())
+        articleContentsDao.insert(content.toArticleContent())
     }
 
     override fun findArticleCommentCount(articleId: String): LiveData<Int> {

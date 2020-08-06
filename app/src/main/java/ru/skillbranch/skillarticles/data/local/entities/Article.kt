@@ -24,7 +24,7 @@ data class Article(
 data class Author(
     @ColumnInfo(name = "user_id")
     val userId: String,
-    val avatar: String? = null,
+    val avatar: String = "",
     val name: String
 )
 
@@ -39,7 +39,6 @@ data class Author(
             ,description
             ,poster
             ,likes
-            ,is_bookmark
             ,comment_count
             ,read_duration
             ,article.category_id AS category_id
@@ -99,7 +98,7 @@ data class ArticleFull(
     @Embedded(prefix = "category_")
     val category: Category,
     @ColumnInfo(name = "shared_link")
-    val sharedLink: String? = null,
+    val shareLink: String? = null,
     @ColumnInfo(name = "is_bookmark")
     val isBookmark: Boolean = false,
     @ColumnInfo(name = "is_like")
