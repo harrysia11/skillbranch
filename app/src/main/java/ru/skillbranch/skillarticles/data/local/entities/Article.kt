@@ -24,7 +24,7 @@ data class Article(
 data class Author(
     @ColumnInfo(name = "user_id")
     val userId: String,
-    val avatar: String = "",
+    val avatar: String? = null,
     val name: String
 )
 
@@ -59,7 +59,7 @@ data class ArticleItem(
     val date: Date = Date(),
     val author: String,
     @ColumnInfo(name = "author_avatar")
-    val authorAvatar: String,
+    val authorAvatar: String?,
     val title: String,
     val description: String,
     val poster: String,

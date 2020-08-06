@@ -18,7 +18,8 @@
             app:argType="string" />
         <argument
             android:name="author_avatar"
-            app:argType="string" />
+            app:argType="string"
+            app:nullable="true" />
         <argument
             android:name="category"
             app:argType="string" />
