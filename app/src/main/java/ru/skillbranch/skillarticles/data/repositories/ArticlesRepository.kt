@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.data.repositories
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -29,11 +30,11 @@ interface IArticlesRepository {
 object ArticlesRepository: IArticlesRepository {
 
     private val network = NetworkDataHolder
-    private val articlesDao: ArticlesDao = db.articlesDao()
-    private val articleCountsDao: ArticleCountsDao = db.articleCountsDao()
-    private val categoriesDao: CategoriesDao = db.categoriesDao()
-    private val tagsDao: TagsDao = db.tagsDao()
-    private val articlePersonalDao: ArticlePersonalInfosDao = db.articlePersonalInfosDao()
+    private var articlesDao: ArticlesDao = db.articlesDao()
+    private var articleCountsDao: ArticleCountsDao = db.articleCountsDao()
+    private var categoriesDao: CategoriesDao = db.categoriesDao()
+    private var tagsDao: TagsDao = db.tagsDao()
+    private var articlePersonalDao: ArticlePersonalInfosDao = db.articlePersonalInfosDao()
 
     override fun loadArticlesFromNetwork(start: Int, size: Int): List<ArticleRes> =
         network.findArticlesItem(start, size)
@@ -82,19 +83,19 @@ object ArticlesRepository: IArticlesRepository {
         tagsDao.incrementTagUseCount(tag)
     }
 
-    fun setupTestDao(articlesDao: ArticlesDao? = null,
-                     articleCountsDao: ArticleCountsDao? = null,
-                     categoriesDao: CategoriesDao? = null,
-                     tagsDao: TagsDao? = null,
-                     articlePersonalDao: ArticlePersonalInfosDao? = null,
-                     articleContentDao: ArticleContentsDao? = null) {
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    fun setupTestDao(
+                    articlesDao: ArticlesDao,
+                     articleCountsDao: ArticleCountsDao,
+                     categoriesDao: CategoriesDao,
+                     tagsDao: TagsDao,
+                     articlePersonalDao: ArticlePersonalInfosDao){
 
-        if(articlesDao != null){val articlesDao = articlesDao }
-        if(articleCountsDao != null){val articleCountsDao = articleCountsDao }
-        if(categoriesDao != null){val categoriesDao = categoriesDao }
-        if(tagsDao != null){val tagsDao = tagsDao }
-        if(articlePersonalDao != null){val articlePersonalDao = articlePersonalDao }
-        if(articleContentDao != null){val articleContentDao = articleContentDao }
+        this.articlesDao = articlesDao
+        this.articleCountsDao = articleCountsDao
+        this.categoriesDao = categoriesDao
+        this.tagsDao = tagsDao
+        this.articlePersonalDao = articlePersonalDao
     }
 
 

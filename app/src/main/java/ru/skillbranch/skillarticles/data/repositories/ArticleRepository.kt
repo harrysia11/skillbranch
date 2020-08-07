@@ -1,6 +1,7 @@
 package ru.skillbranch.skillarticles.data.repositories
 
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
@@ -8,6 +9,10 @@ import androidx.paging.ItemKeyedDataSource
 import ru.skillbranch.skillarticles.data.NetworkDataHolder
 import ru.skillbranch.skillarticles.data.local.DbManager.db
 import ru.skillbranch.skillarticles.data.local.PrefManager
+import ru.skillbranch.skillarticles.data.local.dao.ArticleContentsDao
+import ru.skillbranch.skillarticles.data.local.dao.ArticleCountsDao
+import ru.skillbranch.skillarticles.data.local.dao.ArticlePersonalInfosDao
+import ru.skillbranch.skillarticles.data.local.dao.ArticlesDao
 import ru.skillbranch.skillarticles.data.local.entities.ArticleFull
 import ru.skillbranch.skillarticles.data.models.AppSettings
 import ru.skillbranch.skillarticles.data.models.CommentItemData
@@ -36,10 +41,23 @@ object ArticleRepository : IArticleRepository {
     private val network = NetworkDataHolder
     private val preferences = PrefManager
 
-    private val articlesDao = db.articlesDao()
-    private val articlePersonalDao = db.articlePersonalInfosDao()
-    private val articleCountsDao = db.articleCountsDao()
-    private val articleContentsDao = db.articleContentsDao()
+    private var articlesDao = db.articlesDao()
+    private var articlePersonalDao = db.articlePersonalInfosDao()
+    private var articleCountsDao = db.articleCountsDao()
+    private var articleContentDao = db.articleContentsDao()
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    fun setupTestDao(
+        articlesDao: ArticlesDao,
+        articleCountsDao: ArticleCountsDao,
+        articlePersonalDao: ArticlePersonalInfosDao,
+        articleContentDao: ArticleContentsDao
+    ){
+        this.articlesDao = articlesDao
+        this.articlePersonalDao = articlePersonalDao
+        this.articleCountsDao = articleCountsDao
+        this.articleContentDao = articleContentDao
+    }
 
 
     override fun findArticle(articleId: String): LiveData<ArticleFull> {
@@ -69,7 +87,7 @@ object ArticleRepository : IArticleRepository {
 
     override fun fetchArticleContent(articleId: String) {
         val content = network.loadArticleContent(articleId).apply { sleep(1500) }
-        articleContentsDao.insert(content.toArticleContent())
+        articleContentDao.insert(content.toArticleContent())
     }
 
     override fun findArticleCommentCount(articleId: String): LiveData<Int> {
