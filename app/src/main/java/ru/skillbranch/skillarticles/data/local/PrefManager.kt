@@ -1,7 +1,6 @@
 package ru.skillbranch.skillarticles.data.local
 
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
 import ru.skillbranch.skillarticles.App
@@ -63,17 +62,17 @@ object PrefManager {
             return MutableLiveData(false)
         }
 
-        fun setAuth(auth: Boolean): Unit {
-
-        }
-
-        fun updateSettings(appSettings: AppSettings) {
-
-            val mode = if(appSettings.isDarkMode) AppCompatDelegate.MODE_NIGHT_YES
-            else AppCompatDelegate.MODE_NIGHT_NO
-
-            AppCompatDelegate.setDefaultNightMode(mode)
-
-        }
+//        fun setAuth(auth: Boolean): Unit {
+//
+//        }
+//
+//        fun updateSettings(appSettings: AppSettings) {
+//
+//            val mode = if(appSettings.isDarkMode) AppCompatDelegate.MODE_NIGHT_YES
+//            else AppCompatDelegate.MODE_NIGHT_NO
+//
+//            AppCompatDelegate.setDefaultNightMode(mode)
+//
+//        }
     }
 
