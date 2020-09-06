@@ -6,6 +6,13 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
+import ru.skillbranch.skillarticles.data.remote.err.ApiError
+import ru.skillbranch.skillarticles.data.remote.err.NoNetworkError
+import java.net.SocketTimeoutException
 
 abstract class BaseViewModel<T: IViewModelState>(
     private val handleState: SavedStateHandle,
@@ -16,6 +23,8 @@ abstract class BaseViewModel<T: IViewModelState>(
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     val navigation = MutableLiveData<Event<NavigationCommand>>()
+
+    private val loading = MutableLiveData<Loading>(Loading.HIDE_LOADING)
 
 
     /***
@@ -60,6 +69,17 @@ abstract class BaseViewModel<T: IViewModelState>(
         navigation.value = Event(command)
     }
 
+    /**
+     * отображение индикатора загрузки
+     */
+    protected fun showLoading(loadingType: Loading = Loading.SHOW_LOADING){
+        loading.value = loadingType
+    }
+
+    protected fun hideLoading(){
+        loading.value = Loading.HIDE_LOADING
+    }
+
     /***
      * более компактная форма записи observe() метода LiveData принимает последним аргумент лямбда
      * выражение обрабатывающее изменение текущего стостояния
@@ -83,6 +103,10 @@ abstract class BaseViewModel<T: IViewModelState>(
             EventObserver{ onNavigate(it)})
     }
 
+    fun observeLoading(owner: LifecycleOwner,onChanged: (newState: Loading) -> Unit){
+        loading.observe(owner, Observer{onChanged(it)})
+    }
+
     /***
      * функция принимает источник данных и лямбда выражение обрабатывающее поступающие данные источника
      * лямбда принимает новые данные и текущее состояние ViewModel в качестве аргументов,
@@ -102,8 +126,50 @@ abstract class BaseViewModel<T: IViewModelState>(
     }
 
     fun restoreState(){
+        val restoredState = currentState.restore(handleState) as T
+        if(restoredState == currentState) return
         state.value = currentState.restore(handleState) as T
     }
+
+    protected fun launchSafety(
+        errHandler: ((Throwable) -> Unit)? = null,  // обработчик ошибок
+        compHandler: ((Throwable?) -> Unit)? = null, // обработчик по завершении
+        block: suspend CoroutineScope.() -> Unit  // основной обработчик - suspend fun ( лямбда )
+    ){
+
+        val errHand = CoroutineExceptionHandler{context, throwble ->
+            errHandler?.invoke(throwble)?: when(throwble){
+                is NoNetworkError -> notify(Notify.ErrorMessage("Network is not available, check internet connection",null,null))
+                is SocketTimeoutException-> notify(
+                    Notify.ActionMessage("Network timeout exception - please try again",
+                        "Retry")
+                    {launchSafety( errHandler,compHandler,block)}
+                )
+                is ApiError.InternalServerError-> notify(
+                    Notify.ActionMessage(throwble.message,
+                        "Retry")
+                    {launchSafety( errHandler,compHandler,block)}
+                )
+                is ApiError -> notify(Notify.ErrorMessage(throwble.message,null, null))
+
+                else -> notify(Notify.ErrorMessage(throwble.message ?:"Something goes wrong",null,null))
+            }
+        }
+
+        (viewModelScope + errHand ).launch {
+            // отобразить индикатор загрузки
+            showLoading()
+            block()
+        }.invokeOnCompletion {
+            // скрыть обработчик загрузки
+            hideLoading()
+            compHandler?.invoke(it)
+        }
+    }
+}
+
+enum class Loading {
+    SHOW_LOADING,HIDE_LOADING,SHOW_BLOCKING_LOADING
 }
 
 class Event<out E>(private val content: E) {

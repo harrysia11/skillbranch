@@ -1,39 +1,18 @@
 package ru.skillbranch.skillarticles.data.remote.res
 
-import ru.skillbranch.skillarticles.data.local.entities.Author
-import ru.skillbranch.skillarticles.data.local.entities.Category
-import java.util.*
+import com.squareup.moshi.Json
 
 data class ArticleRes(
+    @Json(name = "data")
     val data: ArticleDataRes,
+    @Json(name = "counts")
     val counts: ArticleCountsRes,
+    @Json(name = "isActive")
     val isActive: Boolean = true
 )
 
-data class ArticleDataRes (
-    val id: String,
-    val date: Date,
-    val author:Author,
-    val title: String,
-    val description: String,
-    val poster: String,
-    val category: Category,
-    val tags: List<String> = listOf()
-)
 
-data class ArticleCountsRes(
-    val articleId : String,
-    val likes: Int = 0,
-    val comments: Int =0,
-    val readDuration: Int = 0,
-    val updatedAt: Long
-)
 
-data class ArticleContentRes(
-    val articleId: String,
-    val content: String,
-    val source: String? = null,
-    val shareLink: String,
-    val updatedAt: Date = Date()
-)
+
+
 

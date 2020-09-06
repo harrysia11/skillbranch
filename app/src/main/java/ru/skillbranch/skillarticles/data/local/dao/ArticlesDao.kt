@@ -12,7 +12,7 @@ import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
 interface ArticlesDao : BaseDao<Article> {
 
     @Transaction
-    fun upsert(list: List<Article>){
+    suspend fun upsert(list: List<Article>){
         insert(list)
             .mapIndexed{
                     index, recordResult -> if(recordResult == -1L) list[index] else null
@@ -23,40 +23,40 @@ interface ArticlesDao : BaseDao<Article> {
             }
     }
 
-    @Query("""
-        SELECT * FROM articles
-        """)
-    fun findArticles(): LiveData<List<Article>>
+//    @Query("""
+//        SELECT * FROM articles
+//        """)
+//    suspend fun findArticles(): LiveData<List<Article>>
 
-    @Query("""
-        SELECT * FROM articles AS articles WHERE articles.id = :id
-        """)
-    fun findArticleById(id: String): LiveData<Article?>
+//    @Query("""
+//        SELECT * FROM articles AS articles WHERE articles.id = :id
+//        """)
+//    suspend fun findArticleById(id: String): LiveData<Article?>
 
 
-    @Query(
-        """
-            SELECT * FROM ArticleItem
-            """
-    )
-    fun findArticleItems():LiveData<List<ArticleItem>>
+//    @Query(
+//        """
+//            SELECT * FROM ArticleItem
+//            """
+//    )
+//    suspend fun findArticleItems():LiveData<List<ArticleItem>>
 
     @Delete
-    fun delete(article: Article)
+    suspend fun delete(article: Article)
 
-    @Query("""
-        SELECT * FROM ArticleItem
-        WHERE category_id IN (:categoryIds)
-    """)
-    fun findArticleItemsByCategoryIds(categoryIds: List<String>): List<ArticleItem>
+//    @Query("""
+//        SELECT * FROM ArticleItem
+//        WHERE category_id IN (:categoryIds)
+//    """)
+//    suspend fun findArticleItemsByCategoryIds(categoryIds: List<String>): List<ArticleItem>
 
-    @Query("""
-        SELECT * FROM ArticleItem
-        INNER JOIN article_tag_x_ref AS refs 
-        ON refs.a_id = id
-        WHERE refs.t_id = :tag
-    """)
-    fun findArticlesByTagId(tag: String): List<ArticleItem>
+//    @Query("""
+//        SELECT * FROM ArticleItem
+//        INNER JOIN article_tag_x_ref AS refs
+//        ON refs.a_id = id
+//        WHERE refs.t_id = :tag
+//    """)
+//    suspend fun findArticlesByTagId(tag: String): List<ArticleItem>
 
     @RawQuery(observedEntities = [ArticleItem::class])
     fun findArticlesByRaw(simpleSQLiteQuery: SimpleSQLiteQuery): DataSource.Factory<Int,ArticleItem>
@@ -66,4 +66,9 @@ interface ArticlesDao : BaseDao<Article> {
         WHERE id = :articleId
     """)
     fun findFullArticle(articleId: String): LiveData<ArticleFull>
+
+    @Query("""
+        SELECT id FROM articles ORDER BY date DESC LIMIT 1
+    """)
+    fun findLastArticleId(): String?
 }

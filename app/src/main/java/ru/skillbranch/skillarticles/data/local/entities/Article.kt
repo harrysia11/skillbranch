@@ -1,6 +1,7 @@
 package ru.skillbranch.skillarticles.data.local.entities
 
 import androidx.room.*
+import ru.skillbranch.skillarticles.data.local.ListConverter
 import ru.skillbranch.skillarticles.data.local.MarkdownConverter
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 import java.util.*
@@ -82,13 +83,16 @@ data class ArticleItem(
     SELECT id,article.title AS title,description, author_user_id,author_name,author_avatar,date,
         category.category_id AS category_category_id, category.title AS category_title, category.icon AS category_icon,
         content.content AS content, content.shared_link AS shared_link,
-        personal.is_bookmark AS is_bookmark, personal.is_like AS is_like
+        personal.is_bookmark AS is_bookmark, personal.is_like AS is_like,
+        GROUP_CONCAT(ref.t_id,",") AS tags, source
         FROM articles AS article
         INNER JOIN articles_categories AS category ON article.category_id = category.category_id
         LEFT JOIN article_contents AS content ON article.id = content.article_id
         LEFT JOIN article_personal_infos AS personal ON personal.article_id = article.id
+        LEFT JOIN article_tag_x_ref AS ref ON article.id = ref.a_id
+        GROUP BY id
 """)
-@TypeConverters(MarkdownConverter::class)
+@TypeConverters(MarkdownConverter::class, ListConverter::class)
 data class ArticleFull(
     val id: String,
     val title: String,
@@ -104,7 +108,7 @@ data class ArticleFull(
     @ColumnInfo(name = "is_like")
     val isLike: Boolean = false,
     val date: Date,
-    val content: List<MarkdownElement>? = null
-  //  val source: String? = null, // TODO
- //   val tags: List<String> = listOf() // TODO
+    val content: List<MarkdownElement>? = null,
+    val source: String? = null,
+    val tags: List<String> = listOf()
 )

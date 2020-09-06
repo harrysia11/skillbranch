@@ -8,6 +8,7 @@ import kotlinx.android.synthetic.main.activity_root.*
 import ru.skillbranch.skillarticles.ui.RootActivity
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.Loading
 
 abstract class BaseFragment<T: BaseViewModel<out IViewModelState>> : Fragment(){
     val root: RootActivity
@@ -54,8 +55,13 @@ abstract class BaseFragment<T: BaseViewModel<out IViewModelState>> : Fragment(){
 
         viewModel.observeNotifications(viewLifecycleOwner){root.renderNotification(it)}
         viewModel.observeNavigation(viewLifecycleOwner){root.viewModel.navigate(it)}
+        viewModel.observeLoading(viewLifecycleOwner){renderLoading(it)}
 
         setupViews()
+    }
+
+    open fun renderLoading(typeLoading: Loading) {
+        root.renderLoading(typeLoading)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {

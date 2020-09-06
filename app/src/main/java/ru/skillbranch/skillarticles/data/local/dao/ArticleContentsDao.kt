@@ -9,6 +9,6 @@ import ru.skillbranch.skillarticles.data.local.entities.ArticleContent
 interface ArticleContentsDao: BaseDao<ArticleContent> {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    override fun insert(obj:ArticleContent): Long
+    override suspend fun insert(obj:ArticleContent): Long
 
 }

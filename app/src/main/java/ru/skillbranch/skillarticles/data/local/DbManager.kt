@@ -14,8 +14,9 @@ object DbManager {
         App.applicationContext(),
         AppDb::class.java,
         AppDb.DATABASE_NAME
-//    ).run { if (BuildConfig.DEBUG) fallbackToDestructiveMigration() else this }
-    ).build()
+        //    .run { if (BuildConfig.DEBUG) fallbackToDestructiveMigration() else this }
+    ).fallbackToDestructiveMigration()
+        .build()
 }
 
 @Database(

@@ -6,36 +6,78 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesViewModel
 
 
 class ChoseCategoryDialog : DialogFragment() {
 
     private val viewModel : ArticlesViewModel by activityViewModels()
-    private val selectedCategories = mutableListOf<String>()
+    private val selected = mutableSetOf<String>()
     private val args: ChoseCategoryDialogArgs by navArgs()
+
+    private val categoryAdapter = CategoryAdapter(){
+        categoryId: String, isChecked: Boolean ->
+        if(isChecked) selected.add(categoryId)
+        else selected.remove(categoryId)
+
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val categories = args.categories.toList().map { "${it.title} (${it.articlesCount})" }.toTypedArray()
-        val checked = BooleanArray(args.categories.size){
-            args.selectedCategories.contains(args.categories[it].categoryId)
+        selected.clear()
+        selected.addAll(
+            savedInstanceState?.getStringArray("checked") ?: args.selectedCategories
+        )
+
+        val categoryItems = args.categories.map{
+            it.toItem(selected.contains(it.categoryId))
         }
 
-        val adb = AlertDialog.Builder(requireContext())
+        categoryAdapter.submitList(categoryItems)
+
+        val listView = layoutInflater.inflate(R.layout.fragment_chose_category_dialog,null) as RecyclerView
+
+        with(listView){
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = categoryAdapter
+        }
+
+        return AlertDialog.Builder(requireContext())
             .setTitle("Choose category")
-            .setPositiveButton("Apply"){ dialog,which ->
-                viewModel.applyCategories(selectedCategories)
+            .setPositiveButton("Apply"){_,_ -> viewModel.applyCategories(selected.toSet())}
+            .setNegativeButton("Reset"){_,_ -> viewModel.applyCategories(emptySet())}
+            .setView(listView)
+            .create()
 
-            }
-            .setNegativeButton("Reset"){dialog, which ->
-                viewModel.applyCategories(emptyList<String>())
-            }
-            .setMultiChoiceItems(categories,checked){dialog,which, isChecked ->
-                if(isChecked) selectedCategories.add(args.categories[which].categoryId)
-                else selectedCategories.remove(args.categories[which].categoryId)
-            }
+//        val categories = args.categories.toList().map { "${it.title} (${it.articlesCount})" }.toTypedArray()
+//        val checked = BooleanArray(args.categories.size){
+//            args.selectedCategories.contains(args.categories[it].categoryId)
+//        }
+//
+//        val adb = AlertDialog.Builder(requireContext())
+//            .setTitle("Choose category")
+//            .setPositiveButton("Apply"){ dialog,which ->
+//                viewModel.applyCategories(selected)
+//
+//            }
+//            .setNegativeButton("Reset"){dialog, which ->
+//                viewModel.applyCategories(emptySet<String>())
+//            }
+//            .setMultiChoiceItems(categories,checked){dialog,which, isChecked ->
+//                if(isChecked) selected.add(args.categories[which].categoryId)
+//                else selected.remove(args.categories[which].categoryId)
+//            }
+//
+//        return adb.create()
 
-        return adb.create()
+
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putStringArray("checked", selected.toTypedArray())
+        super.onSaveInstanceState(outState)
     }
 }

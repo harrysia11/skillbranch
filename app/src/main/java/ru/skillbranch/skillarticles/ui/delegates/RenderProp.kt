@@ -21,7 +21,7 @@ class RenderProp<T: Any>(
 
     override fun setValue(thisRef: Binding, property: KProperty<*>, value: T) {
         if(value == this.value) return
-        Log.e("RenderProp","setValue() ${property.toString()}")
+        Log.e("RenderProp","setValue() ${property.name} oldValue = ${this.value} newValue $value")
         this.value = value
         onChange?.invoke(this.value)
         if(listeners.isNotEmpty()) listeners.forEach{ it.invoke()}

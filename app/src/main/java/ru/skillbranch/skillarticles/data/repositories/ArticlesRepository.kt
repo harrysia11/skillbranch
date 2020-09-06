@@ -1,45 +1,49 @@
 package ru.skillbranch.skillarticles.data.repositories
 
+import NetworkManager
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.sqlite.db.SimpleSQLiteQuery
-import ru.skillbranch.skillarticles.data.NetworkDataHolder
 import ru.skillbranch.skillarticles.data.local.DbManager.db
 import ru.skillbranch.skillarticles.data.local.dao.*
-import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
-import ru.skillbranch.skillarticles.data.local.entities.ArticleTagXRef
-import ru.skillbranch.skillarticles.data.local.entities.CategoryData
-import ru.skillbranch.skillarticles.data.local.entities.Tag
+import ru.skillbranch.skillarticles.data.local.entities.*
 import ru.skillbranch.skillarticles.data.remote.res.ArticleRes
+import ru.skillbranch.skillarticles.data.remote.res.CategoryRes
 import ru.skillbranch.skillarticles.extensions.data.toArticle
+import ru.skillbranch.skillarticles.extensions.data.toArticleContent
 import ru.skillbranch.skillarticles.extensions.data.toArticleCounts
 
 interface IArticlesRepository {
 
-    fun loadArticlesFromNetwork(start: Int = 0, size: Int): List<ArticleRes>
-    fun insertArticlesToDb(articles: List<ArticleRes>)
-    fun toggleBookmark(articleId: String)
+    suspend fun loadArticlesFromNetwork(start: String? =null, size: Int = 10): Int
+    suspend fun insertArticlesToDb(articles: List<ArticleRes>)
+    suspend fun toggleBookmark(articleId: String): Boolean
     fun findTags(): LiveData<List<String>>
     fun findCategoriesData(): LiveData<List<CategoryData>>
     fun rawQueryArticles(filter: ArticleFilter): DataSource.Factory<Int, ArticleItem>
-    fun incrementTagUseCount(tag: String)
+    suspend fun incrementTagUseCount(tag: String)
 
 }
 
 object ArticlesRepository: IArticlesRepository {
 
-    private val network = NetworkDataHolder
+    private val network = NetworkManager.api
     private var articlesDao: ArticlesDao = db.articlesDao()
     private var articleCountsDao: ArticleCountsDao = db.articleCountsDao()
     private var categoriesDao: CategoriesDao = db.categoriesDao()
     private var tagsDao: TagsDao = db.tagsDao()
     private var articlePersonalDao: ArticlePersonalInfosDao = db.articlePersonalInfosDao()
+    private  var articlesContentDao: ArticleContentsDao = db.articleContentsDao()
 
-    override fun loadArticlesFromNetwork(start: Int, size: Int): List<ArticleRes> =
-        network.findArticlesItem(start, size)
+    override suspend fun loadArticlesFromNetwork(start: String?, size: Int): Int {
 
-    override fun insertArticlesToDb(articles: List<ArticleRes>) {
+        val items = network.articles(start, size)
+        if(items.isNotEmpty()) insertArticlesToDb(items)
+        return items.size
+    }
+
+    override suspend fun insertArticlesToDb(articles: List<ArticleRes>) {
         articlesDao.upsert(articles.map {
             it.data.toArticle()
         })
@@ -58,13 +62,13 @@ object ArticlesRepository: IArticlesRepository {
         tagsDao.insert(tags)
         tagsDao.insertRefs(refs.map { ArticleTagXRef(it.first, it.second) })
 
-        val categories = articles.map { it.data.category }.distinct()
+        val categoriesRes = articles.map { it.data.category }.distinct()
 
-        categoriesDao.insert(categories)
+        categoriesDao.insert(categoriesRes.map{it.toCategory()})
     }
 
-    override fun toggleBookmark(articleId: String) {
-        articlePersonalDao.toggleBookmarkOrInsert(articleId)
+    override suspend fun toggleBookmark(articleId: String): Boolean {
+        return articlePersonalDao.toggleBookmarkOrInsert(articleId)
     }
 
     override fun findTags(): LiveData<List<String>> {
@@ -79,7 +83,7 @@ object ArticlesRepository: IArticlesRepository {
         return articlesDao.findArticlesByRaw(SimpleSQLiteQuery(filter.toQuery()))
     }
 
-    override fun incrementTagUseCount(tag: String) {
+    override suspend fun incrementTagUseCount(tag: String) {
         tagsDao.incrementTagUseCount(tag)
     }
 
@@ -89,7 +93,8 @@ object ArticlesRepository: IArticlesRepository {
                      articleCountsDao: ArticleCountsDao,
                      categoriesDao: CategoriesDao,
                      tagsDao: TagsDao,
-                     articlePersonalDao: ArticlePersonalInfosDao){
+                     articlePersonalDao: ArticlePersonalInfosDao,
+                    articlesContentDao: ArticleContentsDao){
 
         this.articlesDao = articlesDao
         this.articleCountsDao = articleCountsDao
@@ -98,12 +103,26 @@ object ArticlesRepository: IArticlesRepository {
         this.articlePersonalDao = articlePersonalDao
     }
 
+    suspend fun findLastArticleId(): String? {
+        return articlesDao.findLastArticleId()
+    }
+
+    suspend fun fetchArticleContent(articleId: String) {
+        val content = network.loadArticleContent(articleId)
+        articlesContentDao.insert(content.toArticleContent())
+    }
+
 
 }
-    class ArticleFilter(
+
+private fun CategoryRes.toCategory()  = Category(categoryId = this.id,
+icon = this.icon, title =  this.title)
+
+
+class ArticleFilter(
         val search: String? = null,
         val isBookmark: Boolean = false,
-        val categories: List<String> = listOf(),
+        val categories: Set<String> = setOf(),
         val isHashtag: Boolean = false
     ) {
         fun toQuery(): String {
@@ -117,7 +136,7 @@ object ArticlesRepository: IArticlesRepository {
                 queryBuilder.appendWhere("refs.t_id = '$search'")
             }
 
-            if (isBookmark) queryBuilder.appendWhere("is_bookmark = true")
+            if (isBookmark) queryBuilder.appendWhere("is_bookmark = 1")
 
             if (categories.isNotEmpty()) queryBuilder.appendWhere(
                 "category_id IN (${categories.joinToString(
