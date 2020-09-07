@@ -112,6 +112,10 @@ object ArticlesRepository: IArticlesRepository {
         articlesContentDao.insert(content.toArticleContent())
     }
 
+    suspend fun removeArticleContent(articleId: String) {
+        articleCountsDao.removeArticleContent(articleId)
+    }
+
 
 }
 

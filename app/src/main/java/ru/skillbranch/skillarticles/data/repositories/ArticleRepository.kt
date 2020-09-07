@@ -16,6 +16,7 @@ import ru.skillbranch.skillarticles.data.local.dao.ArticlesDao
 import ru.skillbranch.skillarticles.data.local.entities.ArticleFull
 import ru.skillbranch.skillarticles.data.models.AppSettings
 import ru.skillbranch.skillarticles.data.models.CommentRes
+import ru.skillbranch.skillarticles.data.remote.NetworkMonitor
 import ru.skillbranch.skillarticles.data.remote.RestService
 import ru.skillbranch.skillarticles.data.remote.err.NoNetworkError
 import ru.skillbranch.skillarticles.data.remote.req.MessageReq
@@ -158,6 +159,21 @@ object ArticleRepository : IArticleRepository {
         totalCount = total,
         errHandler = errHandler
     )
+
+    suspend fun addBookmark(articleId: String) {
+        if(isAuth().value == false) return
+        if(NetworkMonitor.isConnected){
+        //    network.incrementLike(articleId)
+        }else{
+            if(articlePersonalDao.isBookmarked(articleId)){
+
+            }
+        }
+    }
+
+    suspend fun removeBookmark(articleId: String) {
+
+    }
 
 //    override suspend fun loadCommentsByRange(
 //        slug: String?,

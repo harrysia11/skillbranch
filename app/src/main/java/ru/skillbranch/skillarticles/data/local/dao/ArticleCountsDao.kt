@@ -89,4 +89,12 @@ interface ArticleCountsDao: BaseDao<ArticleCounts> {
         WHERE article_id = :articleId
     """)
     suspend fun updateLike(articleId: String, likeCount: Int)
+
+    @Query("SELECT * FROM article_counts WHERE article_id = :articleId")
+    suspend fun findArticlesCountsTest(articleId:String) : ArticleCounts
+
+    @Transaction
+    @Query("DELETE FROM article_counts WHERE article_id = :articleId")
+    suspend fun removeArticleContent(articleId: String)
+
 }
