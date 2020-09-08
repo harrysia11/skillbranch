@@ -16,8 +16,8 @@ import ru.skillbranch.skillarticles.data.local.dao.ArticlesDao
 import ru.skillbranch.skillarticles.data.local.entities.ArticleFull
 import ru.skillbranch.skillarticles.data.models.AppSettings
 import ru.skillbranch.skillarticles.data.models.CommentRes
-import ru.skillbranch.skillarticles.data.remote.NetworkMonitor
 import ru.skillbranch.skillarticles.data.remote.RestService
+import ru.skillbranch.skillarticles.data.remote.err.ApiError
 import ru.skillbranch.skillarticles.data.remote.err.NoNetworkError
 import ru.skillbranch.skillarticles.data.remote.req.MessageReq
 import ru.skillbranch.skillarticles.extensions.data.toArticleContent
@@ -161,18 +161,41 @@ object ArticleRepository : IArticleRepository {
     )
 
     suspend fun addBookmark(articleId: String) {
-        if(isAuth().value == false) return
-        if(NetworkMonitor.isConnected){
-        //    network.incrementLike(articleId)
-        }else{
-            if(articlePersonalDao.isBookmarked(articleId)){
-
+        if(preferences.accessToken.isNullOrEmpty()) {
+            if (!articlePersonalDao.isBookmarked(articleId)) {
+                articlePersonalDao.toggleBookmark(articleId)
+                return
             }
         }
+            try {
+                val res = network.addBookmark(articleId, preferences.accessToken!!)
+                articlePersonalDao.toggleBookmark(articleId)
+            } catch (e: Throwable) {
+                if (e is ApiError.BadRequest) {
+                    articlePersonalDao.toggleBookmark(articleId)
+                    return
+                }
+                throw e
+            }
     }
 
     suspend fun removeBookmark(articleId: String) {
-
+        if(preferences.accessToken.isNullOrEmpty()) {
+            if (articlePersonalDao.isBookmarked(articleId)) {
+                articlePersonalDao.toggleBookmark(articleId)
+                return
+            }
+        }
+        try {
+            val res = network.removeBookmark(articleId, preferences.accessToken!!)
+            articlePersonalDao.toggleBookmark(articleId)
+        } catch (e: Throwable) {
+            if (e is ApiError.BadRequest) {
+                articlePersonalDao.toggleBookmark(articleId)
+                return
+            }
+            throw e
+        }
     }
 
 //    override suspend fun loadCommentsByRange(
