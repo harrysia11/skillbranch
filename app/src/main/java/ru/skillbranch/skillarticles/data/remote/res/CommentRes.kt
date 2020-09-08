@@ -1,11 +1,12 @@
-package ru.skillbranch.skillarticles.data.models
+package ru.skillbranch.skillarticles.data.remote.res
 
 import com.squareup.moshi.Json
+import ru.skillbranch.skillarticles.data.models.User
 import java.util.*
 
 data class CommentRes(
     val id: String,
-    val articleId: String ,
+    val articleId: String,
     @Json(name = "author")
     val user : User,
     @Json(name = "message")

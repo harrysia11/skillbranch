@@ -2,7 +2,6 @@ package ru.skillbranch.skillarticles.data.remote
 
 import retrofit2.Call
 import retrofit2.http.*
-import ru.skillbranch.skillarticles.data.models.CommentRes
 import ru.skillbranch.skillarticles.data.remote.req.LoginReq
 import ru.skillbranch.skillarticles.data.remote.req.MessageReq
 import ru.skillbranch.skillarticles.data.remote.res.*
