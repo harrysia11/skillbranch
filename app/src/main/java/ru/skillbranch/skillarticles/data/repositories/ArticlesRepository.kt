@@ -144,7 +144,7 @@ class ArticleFilter(
 
             if (categories.isNotEmpty()) queryBuilder.appendWhere(
                 "category_id IN (${categories.joinToString(
-                    ","
+                    "\",\"","\"","\""
                 )})"
             )
 

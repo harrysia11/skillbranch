@@ -62,6 +62,15 @@ object PrefManager {
             return MutableLiveData(false)
         }
 
+
+    fun removeAvatar() {
+        profile = profile!!.copy(avatar = "")
+    }
+
+    fun editProfile(name: String, about: String) {
+        profile = profile!!.copy(name = name,about = about)
+    }
+
 //        fun setAuth(auth: Boolean): Unit {
 //
 //        }

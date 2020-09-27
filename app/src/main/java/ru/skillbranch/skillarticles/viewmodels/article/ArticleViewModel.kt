@@ -127,14 +127,15 @@ class ArticleViewModel(
     }
 
     override fun handleBookmark() {
-        var msg = "Add to bookmarks"
-        if (!currentState.isBookmark) msg = "Remove from bookmarks"
 
-        launchSafety(
-            null,
-            {notify(Notify.TextMessage(msg))}
-        ) {
-            repository.toggleBookmark(articleId)
+        launchSafety {
+            val isBookmarked = repository.toggleBookmark(articleId)
+            if(isBookmarked) repository.addBookmark(articleId)
+            else{
+                repository.removeBookmark(articleId)
+            }
+            val msg = if(isBookmarked)" Add to bookmarks" else "Remove from bookmarks"
+            notify(Notify.TextMessage(msg))
         }
     }
 

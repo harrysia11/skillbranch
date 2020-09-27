@@ -3,6 +3,7 @@ package ru.skillbranch.skillarticles.ui.base
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_root.*
 import ru.skillbranch.skillarticles.ui.RootActivity
@@ -11,10 +12,16 @@ import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.Loading
 
 abstract class BaseFragment<T: BaseViewModel<out IViewModelState>> : Fragment(){
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    var _mockRoot: RootActivity? = null
+
     val root: RootActivity
-        get() = activity as RootActivity
+        get() = _mockRoot ?: activity as RootActivity
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    abstract val viewModel: T
     open val binding:Binding? = null
-    protected abstract val viewModel: T
     protected abstract val layout: Int
 
     open val prepareToolbar: (ToolbarBuilder.() -> Unit)? = null
@@ -34,16 +41,6 @@ abstract class BaseFragment<T: BaseViewModel<out IViewModelState>> : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        root.toolbarBuilder
-            .invalidate()
-            .prepare(prepareToolbar)
-            .build(root)
-
-        root.bottombarBuilder
-            .invalidate()
-            .prepare(prepareBottombar)
-            .build(root)
-
         viewModel.restoreState()
         if (savedInstanceState != null) {
             binding?.restoreUi(savedInstanceState)
@@ -57,15 +54,27 @@ abstract class BaseFragment<T: BaseViewModel<out IViewModelState>> : Fragment(){
         viewModel.observeNavigation(viewLifecycleOwner){root.viewModel.navigate(it)}
         viewModel.observeLoading(viewLifecycleOwner){renderLoading(it)}
 
-        setupViews()
     }
 
-    open fun renderLoading(typeLoading: Loading) {
-        root.renderLoading(typeLoading)
-    }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
+
         super.onViewStateRestored(savedInstanceState)
+        // перенесено из onViewCreated()
+        // по причине - toolbar и bottombar могут не существовать в момент вызова onViewCreated()
+
+        root.toolbarBuilder
+            .invalidate()
+            .prepare(prepareToolbar)
+            .build(root)
+
+        root.bottombarBuilder
+            .invalidate()
+            .prepare(prepareBottombar)
+            .build(root)
+
+        setupViews()
+
         binding?.rebind()
     }
 
@@ -95,5 +104,9 @@ abstract class BaseFragment<T: BaseViewModel<out IViewModelState>> : Fragment(){
         }
 
         super.onPrepareOptionsMenu(menu)
+    }
+
+    open fun renderLoading(loadingState: Loading){
+        root.renderLoading(loadingState)
     }
 }

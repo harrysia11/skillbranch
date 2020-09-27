@@ -6,6 +6,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import ru.skillbranch.skillarticles.AppConfig
 import ru.skillbranch.skillarticles.data.JsonConverter
 import ru.skillbranch.skillarticles.data.remote.RestService
+import ru.skillbranch.skillarticles.data.remote.TokenAuthenticator
 import ru.skillbranch.skillarticles.data.remote.interceptors.ErrorStatusInterceptor
 import ru.skillbranch.skillarticles.data.remote.interceptors.NetworkStatusInterceptor
 import java.util.concurrent.TimeUnit
@@ -22,6 +23,7 @@ object NetworkManager {
         val client = OkHttpClient().newBuilder()
             .readTimeout(2,TimeUnit.SECONDS)
             .writeTimeout(5, TimeUnit.SECONDS)
+            .authenticator(TokenAuthenticator()) // refresh token if response status code 401
             .addInterceptor(NetworkStatusInterceptor())
             .addInterceptor(logging) // intercept request & response
             .addInterceptor(ErrorStatusInterceptor())

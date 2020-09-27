@@ -29,7 +29,7 @@ interface IArticleRepository {
     fun updateSettings(copy: AppSettings)
 
     suspend fun toggleLike(articleId: String)
-    suspend fun toggleBookmark(articleId: String)
+    suspend fun toggleBookmark(articleId: String): Boolean
     suspend fun decrementLike(articleId: String)
     suspend fun incrementLike(articleId: String)
     suspend fun sendMessage(articleId: String, message: String, answerToMessageId: String?)
@@ -83,9 +83,9 @@ object ArticleRepository : IArticleRepository {
         articlePersonalDao.toggleLikeOrInsert(articleId)
     }
 
-    override suspend fun toggleBookmark(articleId: String) {
+    override suspend fun toggleBookmark(articleId: String) =
         articlePersonalDao.toggleBookmarkOrInsert(articleId)
-    }
+
 
     override suspend fun decrementLike(articleId: String) {
 

@@ -29,7 +29,7 @@ import kotlinx.android.synthetic.main.fragment_article.*
 import kotlinx.android.synthetic.main.layout_bottombar.*
 import kotlinx.android.synthetic.main.layout_bottombar.view.*
 import kotlinx.android.synthetic.main.layout_submenu.view.*
-import kotlinx.android.synthetic.main.search_view_layout.*
+import kotlinx.android.synthetic.main.search_view_layout.view.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 import ru.skillbranch.skillarticles.extensions.*
@@ -96,6 +96,21 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
     private val submenu
         get() = root.findViewById<ArticleSubmenu>(R.id.submenu)
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun renderLoading(loadingState: Loading) {
+        when (loadingState) {
+            Loading.SHOW_LOADING -> if (!refresh.isRefreshing) root.progress.isVisible = true
+            Loading.SHOW_BLOCKING_LOADING -> refresh.isRefreshing = false
+            Loading.HIDE_LOADING -> {
+                root.progress.isVisible = false
+                if (refresh.isRefreshing) refresh.isRefreshing = false
+            }
+        }
+    }
 
     override fun setupViews() {
         root.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
@@ -131,7 +146,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             .build()
             .apply { start() }
 
-        Glide.with(root)
+        Glide.with(this)//Glide.with(root)
             .load(args.authorAvatar)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
@@ -158,7 +173,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             .override(avatarSize)
             .into(iv_author_avatar)
 
-        Glide.with(root)
+        Glide.with(this)//Glide.with(root)
             .load(args.poster)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
@@ -223,22 +238,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
- //       setHasOptionsMenu(false)
-        setHasOptionsMenu(true)
-    }
 
-    override fun renderLoading(loadingState: Loading) {
-        when(loadingState){
-            Loading.SHOW_LOADING -> if(!refresh.isRefreshing) root.progress.isVisible = true
-            Loading.SHOW_BLOCKING_LOADING -> root.progress.isVisible = false
-            Loading.HIDE_LOADING -> {
-                root.progress.isVisible = false
-                if(refresh.isRefreshing) refresh.isRefreshing = false
-            }
-        }
-    }
 
     override fun onDestroyView() {
         root.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
@@ -423,7 +423,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         {
             tv_text_content.isLoading = it.isEmpty()
             tv_text_content.setContent(it)
-            if(it.isNotEmpty()) setupCopyListener()
+            if (it.isNotEmpty()) setupCopyListener()
 
         }
 
@@ -473,12 +473,9 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         }
 
         override fun saveUi(outState: Bundle) {
-            outState.putBoolean(::isFocusedSearch.name, search_view?.hasFocus() ?: false)
+            outState.putBoolean(::isFocusedSearch.name, toolbar.search_view?.hasFocus() ?: false)
         }
 
-        override fun restoreUi(savedState: Bundle) {
-            isFocusedSearch = savedState.getBoolean(::isFocusedSearch.name)
-        }
     }
 }
 
