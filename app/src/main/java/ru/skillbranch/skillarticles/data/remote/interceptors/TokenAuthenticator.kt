@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.data.remote
+package ru.skillbranch.skillarticles.data.remote.interceptors
 
 import NetworkManager
 import okhttp3.Authenticator
