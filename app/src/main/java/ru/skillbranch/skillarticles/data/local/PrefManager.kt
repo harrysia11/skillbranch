@@ -31,7 +31,7 @@ object PrefManager {
         token.map { it.isNotEmpty()}
     }
 
-        val provileLive: LiveData<User?> by PrefLiveObjDelegate("profile",
+        val profileLive: LiveData<User?> by PrefLiveObjDelegate("profile",
             moshi.adapter(User::class.java),
             preferences)
 

@@ -14,7 +14,12 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "ru.skillbranch.skillarticles.CustomTestRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
     buildTypes {
         release {
@@ -88,6 +93,7 @@ dependencies {
     androidTestImplementation "androidx.test:rules:1.2.0"
     androidTestImplementation "com.jraska.livedata:testing-ktx:1.1.1"
     androidTestImplementation "android.arch.core:core-testing:1.1.1"
+    debugImplementation 'androidx.fragment:fragment-testing:1.2.5'
 }
 repositories {
     mavenCentral()

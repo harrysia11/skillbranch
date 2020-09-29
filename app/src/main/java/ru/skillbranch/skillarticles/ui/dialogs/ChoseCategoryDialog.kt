@@ -23,7 +23,7 @@ class ChoseCategoryDialog : DialogFragment() {
     private val selected = mutableSetOf<String>()
     private val args: ChoseCategoryDialogArgs by navArgs()
 
-    private val categoryAdapter = CategoryAdapter(){
+    private val categoryAdapter = CategoryAdapter {
         categoryId: String, isChecked: Boolean ->
         if(isChecked) selected.add(categoryId)
         else selected.remove(categoryId)

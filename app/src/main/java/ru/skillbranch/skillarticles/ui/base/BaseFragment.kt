@@ -48,7 +48,6 @@ abstract class BaseFragment<T: BaseViewModel<out IViewModelState>> : Fragment(){
 
         viewModel.observeState(viewLifecycleOwner){binding?.bind(it)}
 
-        if(binding?.isInflated == false) binding?.onFinishInflate()
 
         viewModel.observeNotifications(viewLifecycleOwner){root.renderNotification(it)}
         viewModel.observeNavigation(viewLifecycleOwner){root.viewModel.navigate(it)}
@@ -76,6 +75,7 @@ abstract class BaseFragment<T: BaseViewModel<out IViewModelState>> : Fragment(){
         setupViews()
 
         binding?.rebind()
+        if(binding?.isInflated == false) binding?.onFinishInflate()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
@@ -85,6 +86,9 @@ class ProfileFragment() : BaseFragment<ProfileViewModel>() {
 
         permissionsLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions(),resultRegistry,::callbackPermissions)
         cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture(),resultRegistry,::callbackCamera)
+        galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent(),resultRegistry,::callbackGallery)
+        editPhotoLauncher = registerForActivityResult(EditImageContract(),resultRegistry,::callbackEditPhoto)
+        settingsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(),resultRegistry,::callbackSettings)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -127,43 +131,44 @@ class ProfileFragment() : BaseFragment<ProfileViewModel>() {
         }
     }
 
-    private val callbackPermissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            result ->
-            Log.e(TAG,"Request runtime permission result: ${result}")
-            val permissionResult = result.mapValues { (permission: String,isGranted: Boolean) ->
-               if(isGranted) true to true
-                else false to ActivityCompat.shouldShowRequestPermissionRationale(
-                   requireActivity(),
-                   permission
-               )
+    private fun callbackPermissions(result: Map<String, Boolean>){
+        val permissinsResult = result.mapValues {
+            (permission, isGranted) ->
+            if(isGranted) true to true
+            else false to ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(),
+                permission
+            )
+        }
+        val isAllGranted = !permissinsResult.values.map { it.first }.contains(false)
+        if(!isAllGranted){
+            val tempUri = when(val pendingAction = binding.pendingAction){
+                is PendingAction.CameraAction -> pendingAction.payload
+                is PendingAction.EditAction -> pendingAction.payload.second
+                else -> null
             }
-            viewModel.handlePermission(permissionResult)
+            removeTempUri(tempUri)
         }
-
-    private val settingsResultCallback =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-            // после страничек настройки передаем управление сюда и здесь можем
-            // сделать что то еще
-            Log.e(TAG," return from registerForActivityResult")
-        }
-
-    private val galleryResultCallback =
-        registerForActivityResult(ActivityResultContracts.GetContent()){uri ->
-
-        if(uri != null){
-            val inputStream = requireContext().contentResolver.openInputStream(uri)
-            viewModel.handleUploadPhoto(inputStream)
-        }
+        viewModel.handlePermission(permissinsResult)
     }
 
-    private val cameraResultCallback = registerForActivityResult(ActivityResultContracts.TakePicture())
-    { result ->
-        val(payload) = binding.pendingAction as PendingAction.CameraAction
+//    private val callbackPermissions =
+//        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+//            result ->
+//            Log.e(TAG,"Request runtime permission result: ${result}")
+//            val permissionResult = result.mapValues { (permission: String,isGranted: Boolean) ->
+//               if(isGranted) true to true
+//                else false to ActivityCompat.shouldShowRequestPermissionRationale(
+//                   requireActivity(),
+//                   permission
+//               )
+//            }
+//            viewModel.handlePermission(permissionResult)
+//        }
 
+    private fun callbackCamera(result: Boolean){
+        val(payload) = binding.pendingAction as PendingAction.CameraAction
         if(result){
-            // фото было сделано
-            // получаем contentResolver и по uri получаем inputStream
             val inputStream = requireContext().contentResolver.openInputStream(payload)
             viewModel.handleUploadPhoto(inputStream)
         }else{
@@ -171,17 +176,71 @@ class ProfileFragment() : BaseFragment<ProfileViewModel>() {
         }
     }
 
-    private val editPhotoResultCallback =
-        registerForActivityResult(EditImageContract()){
-        result ->
-            if(result != null){
-                val inputStream = requireContext().contentResolver.openInputStream(result)
-                viewModel.handleUploadPhoto(inputStream)
-            }else{
-                val(payload) = binding.pendingAction as PendingAction.EditAction
-                removeTempUri(payload.second)
-            }
+    private fun callbackSettings(result: ActivityResult) {
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            // после страничек настройки передаем управление сюда и здесь можем
+            // сделать что то еще
+            Log.e(TAG, " return from registerForActivityResult")
+        }
     }
+//    private val settingsResultCallback =
+//        registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+//            // после страничек настройки передаем управление сюда и здесь можем
+//            // сделать что то еще
+//            Log.e(TAG," return from registerForActivityResult")
+//        }
+
+    private fun callbackGallery(result: Uri?){
+        if(result != null){
+            val inputStream = requireContext().contentResolver.openInputStream(result)
+            viewModel.handleUploadPhoto(inputStream)
+        }
+    }
+//    private val galleryResultCallback =
+//        registerForActivityResult(ActivityResultContracts.GetContent()){uri ->
+//
+//        if(uri != null){
+//            val inputStream = requireContext().contentResolver.openInputStream(uri)
+//            viewModel.handleUploadPhoto(inputStream)
+//        }
+//    }
+
+    private fun callbackEditPhoto(result: Uri?){
+        if(result != null){
+            // фото было сделано
+            // получаем contentResolver и по uri получаем inputStream
+            val inputStream = requireContext().contentResolver.openInputStream(result)
+            viewModel.handleUploadPhoto(inputStream)
+        }else{
+            val(payload) = binding.pendingAction as PendingAction.EditAction
+            removeTempUri(payload.second)
+        }
+    }
+//    private val cameraResultCallback = registerForActivityResult(ActivityResultContracts.TakePicture())
+//    { result ->
+//        val(payload) = binding.pendingAction as PendingAction.CameraAction
+//
+//        if(result){
+//            // фото было сделано
+//            // получаем contentResolver и по uri получаем inputStream
+//            val inputStream = requireContext().contentResolver.openInputStream(payload)
+//            viewModel.handleUploadPhoto(inputStream)
+//        }else{
+//            removeTempUri(payload)
+//        }
+//    }
+
+//    private val editPhotoResultCallback =
+//        registerForActivityResult(EditImageContract()){
+//        result ->
+//            if(result != null){
+//                val inputStream = requireContext().contentResolver.openInputStream(result)
+//                viewModel.handleUploadPhoto(inputStream)
+//            }else{
+//                val(payload) = binding.pendingAction as PendingAction.EditAction
+//                removeTempUri(payload.second)
+//            }
+//    }
 
 
     override fun setupViews() {
@@ -193,21 +252,28 @@ class ProfileFragment() : BaseFragment<ProfileViewModel>() {
         binding.bind(viewModel.currentState)
 
         viewModel.observerPermissions(viewLifecycleOwner) {
-            callbackPermissions.launch(it.toTypedArray())
+                       permissionsLauncher.launch(it.toTypedArray())
+            //           callbackPermissions.launch(it.toTypedArray())
         }
 
         viewModel.observeActivityResults(viewLifecycleOwner) {
             when (it) {
                 is PendingAction.GalleryAction -> {
-                    galleryResultCallback.launch(it.payload)
+//                    galleryResultCallback.launch(it.payload)
+                    galleryLauncher.launch(it.payload)
                 }
                 is PendingAction.SettingsAction -> {
-                    settingsResultCallback.launch(it.payload)
+                    settingsLauncher.launch(it.payload)
+//                    settingsResultCallback.launch(it.payload)
                 }
                 is PendingAction.CameraAction ->{
-                    cameraResultCallback.launch(it.payload)
+                    cameraLauncher.launch(it.payload)
+//                    cameraResultCallback.launch(it.payload)
                 }
-                is PendingAction.EditAction -> editPhotoResultCallback.launch(it.payload)
+                is PendingAction.EditAction -> {
+                    editPhotoLauncher.launch(it.payload)
+//                    editPhotoResultCallback.launch(it.payload)
+                }
             }
         }
     }
@@ -219,7 +285,8 @@ class ProfileFragment() : BaseFragment<ProfileViewModel>() {
      * будет runtime Error
      * дописываем в Manifest блок Provider
      */
-    private fun prepareTempUri(): Uri {
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    fun prepareTempUri(): Uri {
         val timeStamp = SimpleDateFormat("HHmmss").format(Date())
         val storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val tempFile = File.createTempFile("JPEG_${timeStamp}",".jpg",storageDir)
@@ -248,8 +315,10 @@ class ProfileFragment() : BaseFragment<ProfileViewModel>() {
         }
     }
 
-    private fun removeTempUri(payload: Uri) {
-        requireContext().contentResolver.delete(payload,null,null)
+    @VisibleForTesting
+    fun removeTempUri(uri: Uri?) {
+        uri ?: return
+        requireContext().contentResolver.delete(uri,null,null)
     }
 
     inner class ProfileBinding() : Binding() {

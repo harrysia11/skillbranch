@@ -17,7 +17,7 @@ object ProfileRepository : IProfileRepository{
     private val prefs = PrefManager
     private val network = NetworkManager.api
 
-    override fun getProfile(): LiveData<User?> = prefs.provileLive
+    override fun getProfile(): LiveData<User?> = prefs.profileLive
 
     suspend fun uploadAvatar(body: MultipartBody.Part) {
         val(url) = network.upload(body, prefs.accessToken!!)
