@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.ui.delegates
+package ru.skillbranch.skillarticles.ui.custom.delegates
 
 import android.util.Log
 import ru.skillbranch.skillarticles.ui.base.Binding

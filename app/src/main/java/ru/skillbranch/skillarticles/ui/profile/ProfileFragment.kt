@@ -29,7 +29,7 @@ import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.ui.RootActivity
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
 import ru.skillbranch.skillarticles.ui.base.Binding
-import ru.skillbranch.skillarticles.ui.delegates.RenderProp
+import ru.skillbranch.skillarticles.ui.custom.delegates.RenderProp
 import ru.skillbranch.skillarticles.ui.dialogs.AvatarActionsDialog
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand

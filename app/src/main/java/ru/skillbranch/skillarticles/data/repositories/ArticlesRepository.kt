@@ -124,10 +124,10 @@ icon = this.icon, title =  this.title)
 
 
 class ArticleFilter(
-        val search: String? = null,
-        val isBookmark: Boolean = false,
-        val categories: Set<String> = setOf(),
-        val isHashtag: Boolean = false
+    val search: String? = null,
+    val isBookmark: Boolean = false,
+    val categories: List<String> = listOf(),
+    val isHashtag: Boolean = false
     ) {
         fun toQuery(): String {
             val queryBuilder = QueryBuilder()

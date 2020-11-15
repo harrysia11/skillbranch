@@ -161,7 +161,7 @@ class ArticlesViewModel(handle: SavedStateHandle): BaseViewModel<ArticlesState>(
         }
     }
 
-    fun applyCategories(selectedCategories: Set<String>) {
+    fun applyCategories(selectedCategories: List<String>) {
         updateState { it.copy(selectedCategories = selectedCategories) }
     }
 
@@ -194,7 +194,7 @@ data class ArticlesState(
     val searchQuery: String? = null,
     val isBookmark: Boolean = false,
     val isHashtagSearch: Boolean = false,
-    val selectedCategories: Set<String> = emptySet(),
+    val selectedCategories: List<String> = emptyList(),
     val isLoading: Boolean = true
 ): IViewModelState
 

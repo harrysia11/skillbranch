@@ -20,7 +20,7 @@ class ChoseCategoryDialog : DialogFragment() {
     }
 
 //    private val viewModel : ArticlesViewModel by activityViewModels()
-    private val selected = mutableSetOf<String>()
+    private val selected = mutableListOf<String>()
     private val args: ChoseCategoryDialogArgs by navArgs()
 
     private val categoryAdapter = CategoryAdapter {
@@ -54,11 +54,11 @@ class ChoseCategoryDialog : DialogFragment() {
             .setTitle("Choose category")
             .setPositiveButton("Apply"){
 //                    _,_ -> viewModel.applyCategories(selected.toSet())
-                _,_ -> setFragmentResult(CHOOSE_CATEGORY_KEY, bundleOf(SELECTED_CATEGORIES to selected.toSet()))
+                _,_ -> setFragmentResult(CHOOSE_CATEGORY_KEY, bundleOf(SELECTED_CATEGORIES to selected.toList()))
             }
             .setNegativeButton("Reset"){
 //                    _,_ -> viewModel.applyCategories(emptySet())
-                    _,_ -> setFragmentResult(CHOOSE_CATEGORY_KEY, bundleOf(SELECTED_CATEGORIES to emptySet<String>()))
+                    _,_ -> setFragmentResult(CHOOSE_CATEGORY_KEY, bundleOf(SELECTED_CATEGORIES to emptyList<String>()))
             }
             .setView(listView)
             .create()

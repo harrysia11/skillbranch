@@ -2,7 +2,7 @@ package ru.skillbranch.skillarticles.ui.base
 
 import android.os.Bundle
 import android.util.Log
-import ru.skillbranch.skillarticles.ui.delegates.RenderProp
+import ru.skillbranch.skillarticles.ui.custom.delegates.RenderProp
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import kotlin.reflect.KProperty
 

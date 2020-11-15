@@ -27,7 +27,7 @@ import ru.skillbranch.skillarticles.ui.base.BaseFragment
 import ru.skillbranch.skillarticles.ui.base.Binding
 import ru.skillbranch.skillarticles.ui.base.MenuItemHolder
 import ru.skillbranch.skillarticles.ui.base.ToolbarBuilder
-import ru.skillbranch.skillarticles.ui.delegates.RenderProp
+import ru.skillbranch.skillarticles.ui.custom.delegates.RenderProp
 import ru.skillbranch.skillarticles.ui.dialogs.ChoseCategoryDialog
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesState
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesViewModel
@@ -96,7 +96,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
 
         setFragmentResultListener(ChoseCategoryDialog.CHOOSE_CATEGORY_KEY){
                 _, bundle ->
-            viewModel.applyCategories(bundle[ChoseCategoryDialog.SELECTED_CATEGORIES] as Set<String>)
+            viewModel.applyCategories(bundle[ChoseCategoryDialog.SELECTED_CATEGORIES] as List<String>)
 
         }
 
@@ -230,7 +230,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
 
     inner class ArticlesBinding: Binding(){
         var categories: List<CategoryData> = emptyList()
-        var selectedCategories: Set<String> by RenderProp(emptySet<String>())
+        var selectedCategories: List<String> by RenderProp(emptyList<String>())
         var searchQuery: String? = null
         var isSearch: Boolean = false
         var isLoading: Boolean by RenderProp(true) {
